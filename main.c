@@ -19,6 +19,8 @@
  ********************************************************/
 
 
+/* commentaire test git */
+
 
 int p_x, p_y, p_z; /* position de l'observateur */
 
@@ -97,9 +99,21 @@ void Affichage(){
     bleu.r    = 0.13; bleu.g    = 0.5;  bleu.b    = 0.9;
     bleu_c.r  = 0.35; bleu_c.g  = 0.6;  bleu_c.b  = 0.9;
     bleu_cc.r = 0.6;  bleu_cc.g = 0.75; bleu_cc.b = 0.95;
+
     
     affiche_cube(0, 0, 0, 1, 1, 1, blanc, gris_c, gris);
     affiche_cube(-128, -128, -128, 128, 128, 128, bleu, bleu_c, bleu_cc);
+
+    /* triangle transparent */
+    glBegin(GL_TRIANGLES);
+
+    glColor4f(1.0, 0.0, 0.0, 0.5);
+    glVertex3f(0, -1, 1);
+    glVertex3f(0, -1, 0);
+    glVertex3f(1, -1, 0);
+        
+    glEnd();
+
     
     glFlush();
     glutPostRedisplay();
@@ -145,6 +159,9 @@ int main(int argc, char *argv[]){
 
     glutCreateWindow("Projet SAI");
     glEnable(GL_DEPTH_TEST);
+    /* transparence */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     glutDisplayFunc(Affichage);
     glutIdleFunc(Animer);
