@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <math.h>
 #include "config.h"
 
 
@@ -20,12 +20,17 @@
 
 
 
-int p_x, p_y, p_z; /* position de l'observateur */
+int p_x=0, p_y= -10, p_z=0; /* position de l'observateur */
 
 int test = 0; /* quel vu choisir : 0 = regarde en (0, 0, 0)
                                    1 = regarde devant */
 
 /* x : largeur, y : profondeur, z : hauteur */
+/* Variables pour la gestion de la souris */
+int dernierX = -1, dernierY = -1;
+int boutonSourisPresse = 0;
+float angleRotationX = 0.0f;
+float angleRotationY = 0.0f;
 
 void affiche_cube(int x1, int y1, int z1, int x2, int y2, int z2, couleur c1, couleur c2, couleur c3){
     glBegin(GL_QUADS);
@@ -84,7 +89,11 @@ void Affichage(){
         gluLookAt(p_x, p_y, p_z, 0, 0, 0, 0, 0, 1);
     }
     else {
-        gluLookAt(p_x, p_y, p_z, p_x, p_y + 1, p_z, 0, 0, 1);
+        float targetX = p_x + cos(angleRotationY) * sin(angleRotationX);
+        float targetY = p_y + cos(angleRotationY) * cos(angleRotationX);
+        float targetZ = p_z + sin(angleRotationY);
+        
+        gluLookAt(p_x, p_y, p_z, targetX, targetY, targetZ, 0, 0, 1);
     }
         
     glMatrixMode(GL_MODELVIEW);
@@ -102,43 +111,83 @@ void Affichage(){
     affiche_cube(-128, -128, -128, 128, 128, 128, bleu, bleu_c, bleu_cc);
     
     glFlush();
-    glutPostRedisplay();
+    glutSwapBuffers(); 
 }
 
 
 void Animer(){
-    
-    /* glutPostRedisplay(); */
+    glutPostRedisplay(); 
 }
 
 void GererClavier(unsigned char touche, int x, int y){
-    if (touche == 'q'){  /* gauche */
-        p_x -= 1;
-    } else if (touche == 'd'){  /* droite */
-        p_x += 1;
-    } else if (touche == 'z'){  /* haut */
-        p_z += 1;
-    } else if (touche == 's'){  /* bas */
-        p_z -= 1;
-    } else if (touche == 'c'){  /* changer de vu */
+    float vitesse = 1.0f;
+    
+    // Déplacement avec les touches ZQSD
+    switch(touche) {
+    case 'q':  // gauche
+        p_x -= vitesse * cos(angleRotationX);
+        p_y -= vitesse * sin(angleRotationX);
+        break;
+    case 'd':  // droite
+        p_x += vitesse * cos(angleRotationX);
+        p_y += vitesse * sin(angleRotationX);
+        break;
+    case 'z':  // avant
+        p_x += vitesse * sin(angleRotationX);
+        p_y += vitesse * cos(angleRotationX);
+        break;
+    case 's':  // arrière
+        p_x -= vitesse * sin(angleRotationX);
+        p_y -= vitesse * cos(angleRotationX);
+        break;
+    case 'c':  // changer de vue
         test = !test;
-    } else if (touche == 27){  /* quitté brutalement avec echap */
-        exit(EXIT_FAILURE);
+        break;
+    case 27:   // quitter avec Echap
+        exit(EXIT_SUCCESS);
+    }
+    glutPostRedisplay();
+}
+void GererSouris(int bouton, int etat, int x, int y){
+    if (bouton == GLUT_LEFT_BUTTON) {
+        if (etat == GLUT_DOWN) {
+            boutonSourisPresse = 1;
+            dernierX = x;
+            dernierY = y;
+        } else if (etat == GLUT_UP) {
+            boutonSourisPresse = 0;
+            dernierX = -1;
+            dernierY = -1;
+        }
     }
 }
-
-void GererSouris(int bouton, int etat, int x, int y){
-
-}
-
 void GererMouvementSouris(int x, int y){
-
+    // Seulement si un bouton est pressé
+    if (boutonSourisPresse) {
+           if (dernierX != -1 && dernierY != -1) {
+            float sensibilite = 0.005f;
+            
+            // Calculer le changement de position
+            angleRotationX += (x - dernierX) * sensibilite;
+            angleRotationY += (y - dernierY) * sensibilite;
+            
+            // Limiter la rotation verticale
+            if (angleRotationY > M_PI/2) angleRotationY = M_PI/2;
+            if (angleRotationY < -M_PI/2) angleRotationY = -M_PI/2;
+           
+        }
+        
+        // Mettre à jour les dernières positions
+        dernierX = x;
+        dernierY = y;
+        
+        // Demander un rafraîchissement de l'affichage
+        glutPostRedisplay();
+    }
 }
-
-
 int main(int argc, char *argv[]){
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_SINGLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 
     glutInitWindowSize(LARGUEUR, HAUTEUR);
     glutInitWindowPosition(50, 50);
@@ -150,7 +199,7 @@ int main(int argc, char *argv[]){
     glutIdleFunc(Animer);
     glutKeyboardFunc(GererClavier);
     glutMouseFunc(GererSouris);
-    glutPassiveMotionFunc(GererMouvementSouris);
+    glutMotionFunc(GererMouvementSouris);
 
 
     /* position initial */
