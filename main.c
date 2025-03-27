@@ -180,8 +180,6 @@ void GererMouvementSouris(int x, int y){
         // Mettre à jour les dernières positions
         dernierX = x;
         dernierY = y;
-        
-        // Demander un rafraîchissement de l'affichage
         glutPostRedisplay();
     }
 }
