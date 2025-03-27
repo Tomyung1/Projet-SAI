@@ -7,6 +7,9 @@
 #define LARGUEUR 1600
 #define HAUTEUR 900
 
+#define NIVEAU_MER -5
+
+
 /* le faire avec opengl ? */
 typedef struct {
     double r;
