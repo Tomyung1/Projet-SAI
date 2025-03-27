@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "config.h"
+#include "headers/config.h"
+#include "headers/affichage.h"
+#include "headers/action.h"
 
 
 
