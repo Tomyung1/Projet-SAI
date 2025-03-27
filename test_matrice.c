@@ -6,7 +6,7 @@
 int main(){
     matrice m;
 
-    m = creer_matrice(1, 7);
+    m = creer_matrice(3, 7);
 
     m -> mat[1][2] = 2;
 
