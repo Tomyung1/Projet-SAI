@@ -1,3 +1,5 @@
 *.o
 projet
 matrice
+debug.exec
+log*

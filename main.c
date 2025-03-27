@@ -32,6 +32,8 @@ int p_x, p_y, p_z; /* position de l'observateur */
 int test = 0; /* quel vu choisir : 0 = regarde en (0, 0, 0)
                                    1 = regarde devant */
 
+poisson poiss_test;
+bateau bat_test;
 
 /* x : largeur, y : profondeur, z : hauteur */
 
@@ -56,9 +58,11 @@ void Affichage(){
     
     
     affiche_ciel();
-    affiche_bateau(0, 0, NIVEAU_MER);
-    affiche_bateau(5, 5, NIVEAU_MER);
-    affiche_poisson(-1, 0, NIVEAU_MER - 2);
+    
+    afficher_poisson(poiss_test);
+    afficher_bateau(bat_test);
+    
+    /* afficher les transparent à la fin */
     affiche_eau();
     
     glFlush();
@@ -82,8 +86,12 @@ void GererClavier(unsigned char touche, int x, int y){
         p_z -= 1;
     } else if (touche == 'c'){  /* changer de vu */
         test = !test;
-    } else if (touche == 27){  /* quitté brutalement avec echap */
-        exit(EXIT_FAILURE);
+    } else if (touche == 27){  /* quitté avec echap */
+        
+        liberer_poisson(poiss_test);
+        liberer_bateau(bat_test);
+        
+        exit(EXIT_SUCCESS);
     }
 }
 
@@ -105,6 +113,7 @@ int main(int argc, char *argv[]){
 
     glutCreateWindow("Projet SAI");
     glEnable(GL_DEPTH_TEST);
+    
     /* transparence */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -123,6 +132,13 @@ int main(int argc, char *argv[]){
 
     /* couleur */
     init_affichage();
+
+    
+    poiss_test = creer_poisson();
+    bat_test = creer_bateau();
+    
+    translation(poiss_test.o.modele, 0, 0, -5);
+    
     
     glutMainLoop();
     return 0;

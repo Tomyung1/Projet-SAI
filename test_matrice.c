@@ -14,13 +14,13 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
-    affecter_matrice(m1, 0, 0, 1);
-    affecter_matrice(m1, 1, 0, 2);
-    affecter_matrice(m1, 2, 0, 3);
+    set_mat(m1, 0, 0, 1);
+    set_mat(m1, 1, 0, 2);
+    set_mat(m1, 2, 0, 3);
     
-    affecter_matrice(m2, 0, 0, 1);
-    affecter_matrice(m2, 0, 1, 2);
-    affecter_matrice(m2, 0, 2, 3);
+    set_mat(m2, 0, 0, 1);
+    set_mat(m2, 0, 1, 2);
+    set_mat(m2, 0, 2, 3);
 
     m = mult_matrice(m1, m2);
 
@@ -33,9 +33,7 @@ int main(){
 
     liberer_matrice(m1);
     liberer_matrice(m2);
-    if (m != NULL) {
-        liberer_matrice(m);
-    }
+    liberer_matrice(m);
     
     exit(EXIT_SUCCESS);
 }

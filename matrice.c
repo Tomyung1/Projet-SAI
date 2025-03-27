@@ -52,22 +52,23 @@ matrice creer_matrice(int n, int m){
 
 void liberer_matrice(matrice m){
     int i;
-    
-    for (i = 0; i < m -> n; i++){
-        free(m -> mat[i]);
+    if (m != NULL){
+        for (i = 0; i < m -> n; i++){
+            free(m -> mat[i]);
+        }
+        free(m -> mat);
+        free(m);
     }
-    free(m -> mat);
-    free(m);
 }
 
-void affecter_matrice(matrice m, int l, int c, int v){
-    if (l < 0 || l >= m -> n || c < 0 || c >= m -> m){
-        printf("Coordonnées dans la matrice incorrecte\n");
-    }
-    else {
-        m -> mat[l][c] = v;
-    }
+void set_mat(matrice m, int l, int c, double v){
+    m -> mat[l][c] = v;
 }
+
+double get_mat(matrice m, int l, int c){
+    return m -> mat[l][c];
+}
+
 
 matrice mult_matrice(matrice m1, matrice m2){
     matrice nouv = NULL;
@@ -91,7 +92,7 @@ matrice mult_matrice(matrice m1, matrice m2){
             }
         }
     }
-
+    
     return nouv;
 }
 
@@ -137,4 +138,21 @@ void afficher_matrice(matrice m){
             printf("\n");
         }
     }
+}
+
+
+void translation(matrice modele, double dx, double dy, double dz){
+    matrice t = creer_matrice(4, 4);
+
+    set_mat(t, 0, 0, 1);
+    set_mat(t, 1, 1, 1);
+    set_mat(t, 2, 2, 1);
+    set_mat(t, 3, 3, 1);
+    set_mat(t, 0, 3, dx);
+    set_mat(t, 1, 3, dy);
+    set_mat(t, 2, 3, dz);
+
+    *modele = *(mult_matrice(t, modele));
+    
+    liberer_matrice(t);
 }
