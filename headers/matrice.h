@@ -17,7 +17,7 @@ double get_mat(matrice m, int l, int c);
 matrice mult_matrice(matrice m1, matrice m2);
 void afficher_matrice(matrice m);
 
-void translation(matrice modele, double dx, double dy, double dz);
+void translation(matrice* modele, double dx, double dy, double dz);
 
     
 #endif /* _MATRICE_H_ */

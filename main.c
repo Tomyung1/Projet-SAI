@@ -1,3 +1,4 @@
+
 #include "GL/gl.h"
 #include "GL/glut.h"
 
@@ -44,10 +45,10 @@ void Affichage(){
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-1.2, 1.2, -0.675, 0.675, 1, VISION_MAX);
+    glFrustum(-0.12, 0.12, -0.0675, 0.0675, 0.1, VISION_MAX);
 
     if (test == 0){
-        gluLookAt(p_x, p_y, p_z, 0, 0, 0, 0, 0, 1);
+        gluLookAt(p_x, p_y, p_z, 0, 0, NIVEAU_MER, 0, 0, 1);
     }
     else {
         gluLookAt(p_x, p_y, p_z, p_x, p_y + 1, p_z, 0, 0, 1);
@@ -84,6 +85,10 @@ void GererClavier(unsigned char touche, int x, int y){
         p_z += 1;
     } else if (touche == 's'){  /* bas */
         p_z -= 1;
+    } else if (touche == 'r'){
+        p_y += 1;
+    } else if (touche == 'f'){
+        p_y -= 1;
     } else if (touche == 'c'){  /* changer de vu */
         test = !test;
     } else if (touche == 27){  /* quitté avec echap */
@@ -137,8 +142,8 @@ int main(int argc, char *argv[]){
     poiss_test = creer_poisson();
     bat_test = creer_bateau();
     
-    translation(poiss_test.o.modele, 0, 0, -5);
-    
+    translation(&poiss_test.o.modele, -4, -2, NIVEAU_MER);
+    translation(&bat_test.o.modele, 0, 0, NIVEAU_MER);
     
     glutMainLoop();
     return 0;

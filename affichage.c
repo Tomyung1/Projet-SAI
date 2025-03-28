@@ -110,19 +110,44 @@ void affiche_ciel(){
 
 /* règle de dessin */
 void afficher_bateau(bateau b){
-    /* radeau */
-    /* bord */
-    dessiner_facette_carre(b.o.modele, 0, 1, 2, 3, bateau1);
-    dessiner_facette_carre(b.o.modele, 1, 5, 6, 2, bateau1);
-    dessiner_facette_carre(b.o.modele, 4, 5, 6, 7, bateau1);
-    dessiner_facette_carre(b.o.modele, 4, 0, 3, 7, bateau1);
-    /* haut / bas */
-    dessiner_facette_carre(b.o.modele, 0, 1, 5, 4, bateau2);
-    dessiner_facette_carre(b.o.modele, 7, 6, 2, 3, bateau2);
+
+    /* bateau */
+    /* coque */
+    dessiner_facette_carre(b.o.modele, 0, 1, 2, 3, bateau2);
+    dessiner_facette_triangle(b.o.modele, 1, 5, 2, bateau2);
+    dessiner_facette_carre(b.o.modele, 5, 4, 3, 2, bateau2);
+    dessiner_facette_triangle(b.o.modele, 0, 3, 4, bateau2);
+    dessiner_facette_carre(b.o.modele, 4, 5, 1, 0, bateau1);
     
+    /* cabine */
+    dessiner_facette_carre(b.o.modele, 6, 7, 8, 9, gris_c);
+    dessiner_facette_carre(b.o.modele, 7, 11, 12, 8, gris_c);
+    dessiner_facette_carre(b.o.modele, 10, 11, 12, 13, gris_c);
+    dessiner_facette_carre(b.o.modele, 10, 6, 9, 13, gris_c);
+    dessiner_facette_carre(b.o.modele, 10, 11, 7, 6, gris_c);
+
     /* canne */
-    dessiner_facette_carre(b.o.modele, 8, 9, 10, 11, gris);
-    dessiner_facette_carre(b.o.modele, 10, 11, 12, 13, gris);
+    dessiner_facette_carre(b.o.modele, 14, 16, 18, 19, gris);
+    dessiner_facette_carre(b.o.modele, 16, 15, 17, 18, gris);
+    dessiner_facette_carre(b.o.modele, 14, 15, 17, 19, gris);
+    dessiner_facette_triangle(b.o.modele, 17, 18, 20, gris);
+    dessiner_facette_triangle(b.o.modele, 18, 19, 20, gris);
+    dessiner_facette_triangle(b.o.modele, 19, 17, 20, gris);
+    
+    /* /\* radeau *\/ */
+    /* /\* bord *\/ */
+    /* dessiner_facette_carre(b.o.modele, 0, 1, 2, 3, bateau1); */
+    /* dessiner_facette_carre(b.o.modele, 1, 5, 6, 2, bateau1); */
+    /* dessiner_facette_carre(b.o.modele, 4, 5, 6, 7, bateau1); */
+    /* dessiner_facette_carre(b.o.modele, 4, 0, 3, 7, bateau1); */
+    /* /\* haut / bas *\/ */
+    /* dessiner_facette_carre(b.o.modele, 0, 1, 5, 4, bateau2); */
+    /* dessiner_facette_carre(b.o.modele, 7, 6, 2, 3, bateau2); */
+    
+    /* /\* canne *\/ */
+    /* dessiner_facette_carre(b.o.modele, 8, 9, 10, 11, gris); */
+    /* dessiner_facette_carre(b.o.modele, 10, 11, 12, 13, gris); */
+    
 }
 
 /* règle de dessin */

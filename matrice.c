@@ -141,8 +141,9 @@ void afficher_matrice(matrice m){
 }
 
 
-void translation(matrice modele, double dx, double dy, double dz){
+void translation(matrice* modele, double dx, double dy, double dz){
     matrice t = creer_matrice(4, 4);
+    matrice res;
 
     set_mat(t, 0, 0, 1);
     set_mat(t, 1, 1, 1);
@@ -152,7 +153,12 @@ void translation(matrice modele, double dx, double dy, double dz){
     set_mat(t, 1, 3, dy);
     set_mat(t, 2, 3, dz);
 
-    *modele = *(mult_matrice(t, modele));
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
     
     liberer_matrice(t);
 }
+
