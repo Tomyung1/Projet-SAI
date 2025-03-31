@@ -4,7 +4,7 @@
 #include "headers/matrice.h"
 
 int main(){
-    matrice m1, m2, m;
+    matrice m1, m2;
     
     m1 = creer_matrice(3, 1);
     m2 = creer_matrice(1, 3);
@@ -14,26 +14,8 @@ int main(){
         exit(EXIT_FAILURE);
     }
 
-    set_mat(m1, 0, 0, 1);
-    set_mat(m1, 1, 0, 2);
-    set_mat(m1, 2, 0, 3);
-    
-    set_mat(m2, 0, 0, 1);
-    set_mat(m2, 0, 1, 2);
-    set_mat(m2, 0, 2, 3);
-
-    m = mult_matrice(m1, m2);
-
-    
-    afficher_matrice(m1);
-    printf("\n");
-    afficher_matrice(m2);
-    printf("\n");
-    afficher_matrice(m);
-
     liberer_matrice(m1);
     liberer_matrice(m2);
-    liberer_matrice(m);
     
     exit(EXIT_SUCCESS);
 }

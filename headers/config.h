@@ -11,6 +11,9 @@
 /* niveau de la mer (fixe, peut représenter la moyenne s'il y a des vagues) */
 #define NIVEAU_MER -5
 
+#define NB_POISSONS 4
+#define NB_BATEAUX 4
+#define NB_OBSTACLES 1
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */

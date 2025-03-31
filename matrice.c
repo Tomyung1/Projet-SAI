@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "headers/config.h"
 #include "headers/matrice.h"
@@ -44,6 +45,18 @@ matrice creer_matrice(int n, int m){
         free(nouv -> mat);
         free(nouv);
         return NULL;
+    }
+
+    return nouv;
+}
+
+
+matrice creer_identite(int n){
+    matrice nouv = creer_matrice(n, n);
+    int i;
+    
+    for (i = 0; i < n; i++){
+        set_mat(nouv, i, i, 1);
     }
 
     return nouv;
@@ -142,13 +155,9 @@ void afficher_matrice(matrice m){
 
 
 void translation(matrice* modele, double dx, double dy, double dz){
-    matrice t = creer_matrice(4, 4);
+    matrice t = creer_identite(4);
     matrice res;
 
-    set_mat(t, 0, 0, 1);
-    set_mat(t, 1, 1, 1);
-    set_mat(t, 2, 2, 1);
-    set_mat(t, 3, 3, 1);
     set_mat(t, 0, 3, dx);
     set_mat(t, 1, 3, dy);
     set_mat(t, 2, 3, dz);
@@ -162,3 +171,92 @@ void translation(matrice* modele, double dx, double dy, double dz){
     liberer_matrice(t);
 }
 
+
+/* sens trigo en regardant l'origine depuis (1, 0, 0) */
+void rotation_x(matrice* modele, double theta){
+    matrice t = creer_identite(4);
+    matrice res;
+
+    set_mat(t, 1, 1, cos(theta));
+    set_mat(t, 1, 2, -sin(theta));
+    set_mat(t, 2, 1, sin(theta));
+    set_mat(t, 2, 2, cos(theta));
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}
+
+/* sens trigo en regardant l'origine depuis (0, 1, 0) */
+void rotation_y(matrice* modele, double theta){
+    matrice t = creer_identite(4);
+    matrice res;
+
+    set_mat(t, 0, 0, cos(theta));
+    set_mat(t, 0, 2, sin(theta));
+    set_mat(t, 2, 0, -sin(theta));
+    set_mat(t, 2, 2, cos(theta));
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}
+
+
+
+/* sens trigo en regardant l'origine depuis (0, 0, 1) (vu du dessus) */
+void rotation_z(matrice* modele, double theta){
+    matrice t = creer_identite(4);
+    matrice res;
+
+    set_mat(t, 0, 0, cos(theta));
+    set_mat(t, 0, 1, -sin(theta));
+    set_mat(t, 1, 0, sin(theta));
+    set_mat(t, 1, 1, cos(theta));
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}
+
+
+void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
+    matrice t = creer_identite(4);
+    matrice res;
+    double theta, dx, dy, dz;
+
+    theta = rand() / (double)RAND_MAX * 2 * M_PI;
+    dx = (rand() / (double)RAND_MAX) * (x_max - x_min) + x_min;
+    dy = (rand() / (double)RAND_MAX) * (y_max - y_min) + y_min;
+    dz = (rand() / (double)RAND_MAX) * (z_max - z_min) + z_min;
+
+    printf("angle = %lf, dx = %lf, dy = %lf, dz = %lf\n", theta, dx, dy, dz);
+    
+    set_mat(t, 0, 0, cos(theta));
+    set_mat(t, 0, 1, -sin(theta));
+    set_mat(t, 1, 0, sin(theta));
+    set_mat(t, 1, 1, cos(theta));
+    set_mat(t, 0, 3, dx);
+    set_mat(t, 1, 3, dy);
+    set_mat(t, 2, 3, dz);
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}

@@ -1,13 +1,17 @@
-
 #include "GL/gl.h"
 #include "GL/glut.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
 #include "headers/config.h"
 #include "headers/affichage.h"
 #include "headers/action.h"
+#include "headers/poisson.h"
+#include "headers/bateau.h"
+#include "headers/obstacle.h"
 
 
 
@@ -21,8 +25,8 @@
  * - définir un repère pour le joueur                   *
  *   -> rotation / déplacement du repère, camera dessus *
  *      déplacement de la souris pour tourné            *
- * - définir des structure pour les objets              *
- * - TAD matrice pour les transformations des objets    *
+ * - ajout libération de la mémoire à la fermeture de   *
+ *   la fenêtre                                         *
  *                                                      *
  ********************************************************/
 
@@ -33,14 +37,17 @@ int p_x, p_y, p_z; /* position de l'observateur */
 int test = 0; /* quel vu choisir : 0 = regarde en (0, 0, 0)
                                    1 = regarde devant */
 
-poisson poiss_test;
-bateau bat_test;
+poisson poissons[NB_POISSONS];
+bateau bateaux[NB_BATEAUX];
+obstacle obstacles[NB_OBSTACLES];
 
 /* x : largeur, y : profondeur, z : hauteur */
 
 
 
 void Affichage(){
+    int i;
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glMatrixMode(GL_PROJECTION);
@@ -59,9 +66,18 @@ void Affichage(){
     
     
     affiche_ciel();
+
+    for (i = 0; i < NB_POISSONS; i++){
+        afficher_poisson(poissons[i]);
+    }
     
-    afficher_poisson(poiss_test);
-    afficher_bateau(bat_test);
+    for (i = 0; i < NB_BATEAUX; i++){
+        afficher_bateau(bateaux[i]);
+    }
+
+    for (i = 0; i < NB_OBSTACLES; i++){
+        afficher_obstacle(obstacles[i]);
+    }
     
     /* afficher les transparent à la fin */
     affiche_eau();
@@ -77,6 +93,8 @@ void Animer(){
 }
 
 void GererClavier(unsigned char touche, int x, int y){
+    int i;
+    
     if (touche == 'q'){  /* gauche */
         p_x -= 1;
     } else if (touche == 'd'){  /* droite */
@@ -92,9 +110,16 @@ void GererClavier(unsigned char touche, int x, int y){
     } else if (touche == 'c'){  /* changer de vu */
         test = !test;
     } else if (touche == 27){  /* quitté avec echap */
-        
-        liberer_poisson(poiss_test);
-        liberer_bateau(bat_test);
+
+        for (i = 0; i < NB_POISSONS; i++){
+            liberer_poisson(poissons[i]);
+        }
+        for (i = 0; i < NB_BATEAUX; i++){
+            liberer_bateau(bateaux[i]);
+        }
+        for (i = 0; i < NB_OBSTACLES; i++){
+            liberer_obstacle(obstacles[i]);
+        }
         
         exit(EXIT_SUCCESS);
     }
@@ -110,6 +135,8 @@ void GererMouvementSouris(int x, int y){
 
 
 int main(int argc, char *argv[]){
+    int i;
+    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_SINGLE);
 
@@ -132,19 +159,42 @@ int main(int argc, char *argv[]){
 
     /* position initial */
     p_x = 0;
-    p_y = -10;  /* distance du centre, négatif pour reculer */
+    p_y = -30;  /* distance du centre, négatif pour reculer */
     p_z = 0;
 
     /* couleur */
     init_affichage();
 
+    /* aléatoire */
+    srand(time(NULL));
+
+    for (i = 0; i < NB_POISSONS; i++){
+        poissons[i] = creer_poisson();
+    }
+
+    for (i = 0; i < NB_BATEAUX; i++){
+        bateaux[i] = creer_bateau();
+    }
+
+    for (i = 0; i < NB_OBSTACLES; i++){
+        obstacles[i] = creer_obstacle();
+    }
+
+
+    /* fonction... */
+    trans_rot_z_alea(&poissons[0].o.modele, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    trans_rot_z_alea(&poissons[1].o.modele, -15, -5, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    trans_rot_z_alea(&poissons[2].o.modele, 5, 15, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    trans_rot_z_alea(&poissons[3].o.modele, -15, -5, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
+
+    trans_rot_z_alea(&bateaux[0].o.modele, 5, 15, 5, 15, NIVEAU_MER, NIVEAU_MER);
+    trans_rot_z_alea(&bateaux[1].o.modele, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
+    trans_rot_z_alea(&bateaux[2].o.modele, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
+    trans_rot_z_alea(&bateaux[3].o.modele, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
+
+    translation(&obstacles[0].o.modele, 0, 0, NIVEAU_MER);
     
-    poiss_test = creer_poisson();
-    bat_test = creer_bateau();
-    
-    translation(&poiss_test.o.modele, -4, -2, NIVEAU_MER);
-    translation(&bat_test.o.modele, 0, 0, NIVEAU_MER);
-    
+  
     glutMainLoop();
     return 0;
 }

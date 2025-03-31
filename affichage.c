@@ -9,6 +9,7 @@
 #include "headers/matrice.h"
 #include "headers/poisson.h"
 #include "headers/bateau.h"
+#include "headers/obstacle.h"
 
 /* palette de couleur */
 couleur blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
@@ -173,6 +174,18 @@ void afficher_poisson(poisson p){
     dessiner_facette_triangle(p.o.modele, 13, 9, 10, poisson1);
     dessiner_facette_carre(p.o.modele, 10, 11, 12, 13, poisson1);
 }
+
+/* règle de dessin */
+void afficher_obstacle(obstacle ob){
+    /* cube... */
+    dessiner_facette_carre(ob.o.modele, 0, 1, 2, 3, gris);
+    dessiner_facette_carre(ob.o.modele, 1, 5, 6, 2, gris);
+    dessiner_facette_carre(ob.o.modele, 5, 6, 7, 4, gris);
+    dessiner_facette_carre(ob.o.modele, 0, 4, 7, 3, gris);
+    dessiner_facette_carre(ob.o.modele, 7, 6, 2, 3, gris);
+    dessiner_facette_carre(ob.o.modele, 4, 5, 1, 0, gris);
+}
+
 
 /* affiche l'eau */
 void affiche_eau() {
