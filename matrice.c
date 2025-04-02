@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "matrice.h"
+#include "headers/config.h"
+#include "headers/matrice.h"
 
 
 matrice creer_matrice(int n, int m){
