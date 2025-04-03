@@ -40,6 +40,12 @@ int test = 0; /* quel vu choisir : 0 = regarde en (0, 0, 0)
 poisson poissons[NB_POISSONS];
 bateau bateaux[NB_BATEAUX];
 obstacle obstacles[NB_OBSTACLES];
+int souris_x_prec = -1;  /* Position précédente de la souris en X */
+int souris_y_prec = -1;  /* Position précédente de la souris en Y */
+float angle_y = 0.0;     /* Angle de rotation autour de l'axe Y */
+float angle_z = 0.0;     /* Angle de rotation autour de l'axe Z */
+int bouton_presse = 0;   /* État des boutons de la souris */
+
 
 /* x : largeur, y : profondeur, z : hauteur */
 
@@ -86,10 +92,60 @@ void Affichage(){
     glutPostRedisplay();
 }
 
-
-void Animer(){
+void Animer() {
+    int i;
     
-    /* glutPostRedisplay(); */
+    // Déplacer tous les poissons
+    for (i = 0; i < NB_POISSONS; i++) {
+        deplacer_poisson(&poissons[i]);
+        
+        // Vérifier si un poisson est proche d'un bateau
+        // Si oui, le mettre en état de fuite
+        for (int j = 0; j < NB_BATEAUX; j++) {
+            // Récupérer les positions
+            double poisson_x = get_mat(poissons[i].o.modele, 0, 0);
+            double poisson_y = get_mat(poissons[i].o.modele, 1, 0);
+            double poisson_z = get_mat(poissons[i].o.modele, 2, 0);
+            
+            double bateau_x = get_mat(bateaux[j].o.modele, 0, 0);
+            double bateau_y = get_mat(bateaux[j].o.modele, 1, 0);
+            double bateau_z = get_mat(bateaux[j].o.modele, 2, 0);
+            
+            // Calculer la distance
+            double distance = sqrt(pow(poisson_x - bateau_x, 2) + 
+                                  pow(poisson_y - bateau_y, 2) + 
+                                  pow(poisson_z - bateau_z, 2));
+            
+            // Si un bateau est proche, le poisson fuit
+            if (distance < 8.0) {
+                mettre_en_fuite(&poissons[i]);
+                
+                // Direction opposée au bateau
+                poissons[i].direction_x = poisson_x - bateau_x;
+                poissons[i].direction_y = poisson_y - bateau_y;
+                poissons[i].direction_z = poisson_z - bateau_z;
+                
+                // Normaliser
+                double longueur = sqrt(poissons[i].direction_x * poissons[i].direction_x + 
+                                     poissons[i].direction_y * poissons[i].direction_y + 
+                                     poissons[i].direction_z * poissons[i].direction_z);
+                
+                if (longueur > 0) {
+                    poissons[i].direction_x /= longueur;
+                    poissons[i].direction_y /= longueur;
+                    poissons[i].direction_z /= longueur;
+                }
+                
+                // Rotation pour faire face à la nouvelle direction
+                double angle = atan2(poissons[i].direction_y, poissons[i].direction_x);
+                rotation_z(&poissons[i].o.modele, angle - M_PI/2); 
+                
+                break; // Un seul bateau suffit pour fuir
+            }
+        }
+    }
+    
+    glutPostRedisplay();
 }
 
 void GererClavier(unsigned char touche, int x, int y){
@@ -125,12 +181,76 @@ void GererClavier(unsigned char touche, int x, int y){
     }
 }
 
-void GererSouris(int bouton, int etat, int x, int y){
-
+void GererSouris(int bouton, int etat, int x, int y) {
+    /* Sauvegarde de la position actuelle de la souris */
+    souris_x_prec = x;
+    souris_y_prec = y;
+    
+    /* Mémorisation de l'état du bouton */
+    if (etat == GLUT_DOWN) {
+        bouton_presse = bouton;
+    } else {
+        bouton_presse = -1;  /* Aucun bouton pressé */
+    }
+    
+    /* Zoom avec la molette de la souris */
+    if (etat == GLUT_DOWN) {
+        switch (bouton) {
+            case 3:  /* Molette vers le haut: zoom avant */
+                p_y += 2;
+                break;
+            case 4:  /* Molette vers le bas: zoom arrière */
+                p_y -= 2;
+                break;
+        }
+    }
 }
 
-void GererMouvementSouris(int x, int y){
-
+/* Fonction pour gérer les mouvements de la souris */
+void GererMouvementSouris(int x, int y) {
+    /* Calcul du déplacement de la souris */
+    int dx = x - souris_x_prec;
+    int dy = y - souris_y_prec;
+    
+    /* Si le bouton gauche est pressé pendant le déplacement */
+    if (bouton_presse == GLUT_LEFT_BUTTON) {
+        /* Rotation de la caméra */
+        angle_y += dx * 0.5;
+        angle_z += dy * 0.5;
+        
+        /* Limiter l'angle Z pour éviter de se retourner */
+        if (angle_z > 60.0) angle_z = 60.0;
+        if (angle_z < -60.0) angle_z = -60.0;
+        
+        /* Calculer la nouvelle position en fonction des angles */
+        if (test == 0) {
+            /* Mode "regarde en (0,0,0)" */
+            float distance = sqrt(p_x*p_x + p_y*p_y + p_z*p_z);
+            p_x = distance * sin(angle_y * M_PI/180.0);
+            p_y = -distance * cos(angle_y * M_PI/180.0);
+            p_z = distance * sin(angle_z * M_PI/180.0);
+        } else {
+        }
+    }
+    
+    /* Si le bouton droit est pressé pendant le déplacement */
+    if (bouton_presse == GLUT_RIGHT_BUTTON) {
+        /* Déplacement latéral (gauche/droite) */
+        p_x += dx * 0.1;
+        
+        /* Déplacement avant/arrière */
+        p_y -= dy * 0.1;
+    }
+    
+    /* Si le bouton du milieu est pressé pendant le déplacement */
+    if (bouton_presse == GLUT_MIDDLE_BUTTON) {
+        /* Déplacement vertical (haut/bas) */
+        p_z -= dy * 0.1;
+    }
+    
+    /* Mise à jour de la position précédente */
+    souris_x_prec = x;
+    souris_y_prec = y;
 }
 
 

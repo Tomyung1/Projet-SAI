@@ -3,12 +3,15 @@
 
 #include "matrice.h"
 
-/* MACRO etat */
+/* états possibles */
 #define E_INITIAL 0
+#define E_NORMAL 1
+#define E_ACTION 2
+#define E_FIN 3
 
 typedef struct {
-    int etat;        /* état de l'objet (comportement) */
-    matrice modele;  /* matrice 4 * nb_sommet */
+    matrice modele;
+    int etat;
 } objet;
 
 matrice lire_modele(char * chemin);
