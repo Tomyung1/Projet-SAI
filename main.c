@@ -40,15 +40,13 @@ int test = 0; /* quel vu choisir : 0 = regarde en (0, 0, 0)
 poisson poissons[NB_POISSONS];
 bateau bateaux[NB_BATEAUX];
 obstacle obstacles[NB_OBSTACLES];
-<<<<<<< HEAD
-=======
 int souris_x_prec = -1;  /* Position précédente de la souris en X */
 int souris_y_prec = -1;  /* Position précédente de la souris en Y */
 float angle_y = 0.0;     /* Angle de rotation autour de l'axe Y */
 float angle_z = 0.0;     /* Angle de rotation autour de l'axe Z */
 int bouton_presse = 0;   /* État des boutons de la souris */
 
->>>>>>> branche-tom
+
 
 /* x : largeur, y : profondeur, z : hauteur */
 
