@@ -15,3 +15,6 @@
 | Grand cube / ciel 1    | (72, 202, 228)  | (0.28, 0.79, 0.89) | ![Grand cube / ciel 1](https://singlecolorimage.com/get/48cae4/20x20)    |
 | Grand cube / ciel 2    | (144, 224, 239) | (0.56, 0.88, 0.94) | ![Grand cube / ciel 2](https://singlecolorimage.com/get/90e0ef/20x20)    |
 | Grand cube / ciel haut | (173, 232, 244) | (0.68, 0.91, 0.96) | ![Grand cube / ciel haut](https://singlecolorimage.com/get/ade8f4/20x20) |
+| Gris clair             | (230, 230, 230) | (0.90, 0.90, 0.90) | ![Gris clair](https://singlecolorimage.com/get/e6e6e6/20x20)             |
+| Gris moyen             | (191, 191, 191) | (0.75, 0.75, 0.75) | ![Gris moyen](https://singlecolorimage.com/get/bfbfbf/20x20)             |
+| Gris foncé             | (153, 153, 153) | (0.60, 0.60, 0.60) | ![Gris foncé](https://singlecolorimage.com/get/999999/20x20)             |
