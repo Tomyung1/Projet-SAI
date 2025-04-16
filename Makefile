@@ -15,7 +15,7 @@ matrice : test_matrice.c matrice.o
 	gcc $(CFLAGS) $^ -o $@ -lm
 
 debug : debug.exec
-	valgrind --leak-check=full --show-leak-kinds=all ./debug.exec 2> log
+	valgrind --leak-check=full --show-leak-kinds=all ./debug.exec 2> log ; tail log
 
 debug.exec : main.c action.o affichage.o objet.o poisson.o bateau.o obstacle.o matrice.o $(HEADER)config.h
 	gcc $(DEBUGFLAGS) $^ -o $@ $(OPENGL) -lm
