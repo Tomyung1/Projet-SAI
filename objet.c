@@ -19,7 +19,7 @@
 
 matrice lire_modele(char * chemin){
     FILE * f = NULL;
-    int nb; /* nombre de sommets */
+    int n; /* nombre de sommets */
     double x, y, z;
     int i;
     matrice modele;
@@ -29,15 +29,22 @@ matrice lire_modele(char * chemin){
         exit(EXIT_FAILURE);
     }
 
-    if (fscanf(f, "%d\n", &nb) != 1){
+    if (fscanf(f, "%d\n", &n) != 1){
         printf("Erreur lecture du nombre de sommet du modèle 3D\n");
         fclose(f);
         exit(EXIT_FAILURE);
     }
 
-    modele = creer_matrice(4, nb);
+    modele = creer_matrice(4, n + 1);
+
+    /* La position */
+    set_mat(modele, 0, 0, 0);
+    set_mat(modele, 1, 0, 0);
+    set_mat(modele, 2, 0, 0);
+    set_mat(modele, 3, 0, 0);
     
-    for (i = 0; i < nb; i++){
+    /* Les points */
+    for (i = 1; i < n + 1; i++){
         if (fscanf(f, "%lf,%lf,%lf\n", &x, &y, &z) != 3){
             printf("Échec lecture coordonnées du modèle 3D\n");
             liberer_matrice(modele);

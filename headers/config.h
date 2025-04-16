@@ -8,6 +8,14 @@
 #define LARGUEUR 1600
 #define HAUTEUR 900
 
+/* limite du monde */
+#define LIMITE_MIN_X -128
+#define LIMITE_MIN_Y -128
+#define LIMITE_MIN_Z -128
+#define LIMITE_MAX_X 128
+#define LIMITE_MAX_Y 128
+#define LIMITE_MAX_Z 128
+
 /* niveau de la mer (fixe, peut représenter la moyenne s'il y a des vagues) */
 #define NIVEAU_MER -5
 

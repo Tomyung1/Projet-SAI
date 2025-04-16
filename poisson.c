@@ -32,6 +32,8 @@ poisson creer_poisson(){
     p.direction_x /= longueur;
     p.direction_y /= longueur;
     p.direction_z /= longueur;
+
+    
     
     // État initial
     p.etat_poisson = ETAT_NORMAL;
@@ -43,6 +45,7 @@ poisson creer_poisson(){
 void liberer_poisson(poisson p){
     liberer_matrice(p.o.modele);
 }
+
 
 // Déplace le poisson selon sa direction et sa vitesse
 void deplacer_poisson(poisson *p) {

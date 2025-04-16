@@ -54,7 +54,7 @@ int bouton_presse = 0;   /* État des boutons de la souris */
 
 void Affichage(){
     int i;
-    
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glMatrixMode(GL_PROJECTION);
@@ -70,7 +70,6 @@ void Affichage(){
         
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
     
     affiche_ciel();
 
@@ -113,12 +112,12 @@ void Animer() {
             double bateau_z = get_mat(bateaux[j].o.modele, 2, 0);
             
             // Calculer la distance
-            double distance = sqrt(pow(poisson_x - bateau_x, 2) + 
+            double distance = pow(poisson_x - bateau_x, 2) + 
                                   pow(poisson_y - bateau_y, 2) + 
-                                  pow(poisson_z - bateau_z, 2));
+                                  pow(poisson_z - bateau_z, 2);
             
             // Si un bateau est proche, le poisson fuit
-            if (distance < 8.0) {
+            if (distance < 8.0 * 8.0) {
                 mettre_en_fuite(&poissons[i]);
                 
                 // Direction opposée au bateau
@@ -209,49 +208,7 @@ void GererSouris(int bouton, int etat, int x, int y) {
 
 /* Fonction pour gérer les mouvements de la souris */
 void GererMouvementSouris(int x, int y) {
-    /* Calcul du déplacement de la souris */
-    int dx = x - souris_x_prec;
-    int dy = y - souris_y_prec;
     
-    /* Si le bouton gauche est pressé pendant le déplacement */
-    if (bouton_presse == GLUT_LEFT_BUTTON) {
-        /* Rotation de la caméra */
-        angle_y += dx * 0.5;
-        angle_z += dy * 0.5;
-        
-        /* Limiter l'angle Z pour éviter de se retourner */
-        if (angle_z > 60.0) angle_z = 60.0;
-        if (angle_z < -60.0) angle_z = -60.0;
-        
-        /* Calculer la nouvelle position en fonction des angles */
-        if (test == 0) {
-            /* Mode "regarde en (0,0,0)" */
-            float distance = sqrt(p_x*p_x + p_y*p_y + p_z*p_z);
-            p_x = distance * sin(angle_y * M_PI/180.0);
-            p_y = -distance * cos(angle_y * M_PI/180.0);
-            p_z = distance * sin(angle_z * M_PI/180.0);
-        } else {
-        }
-    }
-    
-    /* Si le bouton droit est pressé pendant le déplacement */
-    if (bouton_presse == GLUT_RIGHT_BUTTON) {
-        /* Déplacement latéral (gauche/droite) */
-        p_x += dx * 0.1;
-        
-        /* Déplacement avant/arrière */
-        p_y -= dy * 0.1;
-    }
-    
-    /* Si le bouton du milieu est pressé pendant le déplacement */
-    if (bouton_presse == GLUT_MIDDLE_BUTTON) {
-        /* Déplacement vertical (haut/bas) */
-        p_z -= dy * 0.1;
-    }
-    
-    /* Mise à jour de la position précédente */
-    souris_x_prec = x;
-    souris_y_prec = y;
 }
 
 
@@ -314,8 +271,7 @@ int main(int argc, char *argv[]){
     trans_rot_z_alea(&bateaux[3].o.modele, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
 
     translation(&obstacles[0].o.modele, 0, 0, NIVEAU_MER);
-    
-  
+
     glutMainLoop();
     return 0;
 }
