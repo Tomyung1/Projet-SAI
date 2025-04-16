@@ -231,6 +231,30 @@ void rotation_z(matrice* modele, double theta){
     liberer_matrice(t);
 }
 
+void rotation_sur_place(matrice* modele, double theta, char axe){
+    double px, py, pz;
+
+    px = get_mat(*modele, 0, 0);
+    py = get_mat(*modele, 1, 0);
+    pz = get_mat(*modele, 2, 0);
+
+    translation(modele, -px, -py, -pz);
+    switch (axe){
+    case 'x':
+        rotation_x(modele, theta);
+        break;
+    case 'y':
+        rotation_y(modele, theta);
+        break;
+    case 'z':
+        rotation_z(modele, theta);
+        break;
+    default:
+        break;
+    }
+    translation(modele, px, py, pz);
+}
+
 
 void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
     matrice t = creer_identite(4);

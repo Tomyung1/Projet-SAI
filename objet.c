@@ -41,7 +41,7 @@ matrice lire_modele(char * chemin){
     set_mat(modele, 0, 0, 0);
     set_mat(modele, 1, 0, 0);
     set_mat(modele, 2, 0, 0);
-    set_mat(modele, 3, 0, 0);
+    set_mat(modele, 3, 0, 1);
     
     /* Les points */
     for (i = 1; i < n + 1; i++){

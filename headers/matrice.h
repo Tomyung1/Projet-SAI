@@ -23,6 +23,7 @@ void translation(matrice* modele, double dx, double dy, double dz);
 void rotation_x(matrice* modele, double theta);
 void rotation_y(matrice* modele, double theta);
 void rotation_z(matrice* modele, double theta);
+void rotation_sur_place(matrice* modele, double theta, char axe);
 void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
 
 

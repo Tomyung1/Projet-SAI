@@ -178,6 +178,9 @@ void GererClavier(unsigned char touche, int x, int y){
         }
         
         exit(EXIT_SUCCESS);
+    } else if (touche == 't'){
+        rotation_sur_place(&bateaux[0].o.modele, M_PI / 4, 'z');
+        translation(&bateaux[1].o.modele, 1, 0, 0);
     }
 }
 
@@ -271,7 +274,8 @@ int main(int argc, char *argv[]){
     trans_rot_z_alea(&bateaux[3].o.modele, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
 
     translation(&obstacles[0].o.modele, 0, 0, NIVEAU_MER);
-
+    
+    
     glutMainLoop();
     return 0;
 }
