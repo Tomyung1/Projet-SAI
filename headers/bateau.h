@@ -8,10 +8,13 @@
 
 typedef struct {
     objet o;
-    /* plus ? */
+    double vitesse;
+    matrice direction;
 } bateau;
 
 bateau creer_bateau();
 void liberer_bateau(bateau b);
+void deplacer_bateau(bateau *b);
+void tourner_bateau(bateau *b, char sens);
 
 #endif /* _BATEAU_H_ */

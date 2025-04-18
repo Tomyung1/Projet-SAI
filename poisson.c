@@ -32,7 +32,6 @@ poisson creer_poisson(){
     p.direction_x /= longueur;
     p.direction_y /= longueur;
     p.direction_z /= longueur;
-
     
     
     // État initial
@@ -47,8 +46,17 @@ void liberer_poisson(poisson p){
 }
 
 
-// Déplace le poisson selon sa direction et sa vitesse
 void deplacer_poisson(poisson *p) {
+    double dx = p->direction_x * p->vitesse;
+    double dy = p->direction_y * p->vitesse; 
+    double dz = p->direction_z * p->vitesse;
+
+    translation(&(p -> o.modele), dx, dy, dz);
+}
+
+
+// Déplace le poisson selon sa direction et sa vitesse
+void deplacer_poisson_old(poisson *p) {
     // Calculer le déplacement
     double dt = 1.0/60.0; // Assuming 60 FPS or use actual elapsed time 
     double dx = p->direction_x * p->vitesse * dt;
@@ -77,7 +85,7 @@ void deplacer_poisson(poisson *p) {
         p->direction_x = -p->direction_x;
         // Rotation pour faire face à la nouvelle direction
         double angle = atan2(p->direction_y, p->direction_x);
-        rotation_z(&p->o.modele, angle - M_PI/2); // Ajuster selon votre modèle
+        rotation_sur_place(&p->o.modele, angle - M_PI/2, 'z'); // Ajuster selon votre modèle
     }
     
     if (y_pos > limite_y || y_pos < -limite_y) {

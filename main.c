@@ -93,7 +93,7 @@ void Affichage(){
 }
 
 void Animer() {
-    int i;
+    int i, j;
     
     // Déplacer tous les poissons
     for (i = 0; i < NB_POISSONS; i++) {
@@ -101,7 +101,7 @@ void Animer() {
         
         // Vérifier si un poisson est proche d'un bateau
         // Si oui, le mettre en état de fuite
-        for (int j = 0; j < NB_BATEAUX; j++) {
+        for (j = 0; j < NB_BATEAUX; j++) {
             // Récupérer les positions
             double poisson_x = get_mat(poissons[i].o.modele, 0, 0);
             double poisson_y = get_mat(poissons[i].o.modele, 1, 0);
@@ -143,6 +143,12 @@ void Animer() {
                 break; // Un seul bateau suffit pour fuir
             }
         }
+    }
+
+
+    for (i = 0; i < NB_BATEAUX; i++) {
+        deplacer_bateau(&bateaux[i]);
+        tourner_bateau(&bateaux[i], 'd');
     }
     
     glutPostRedisplay();
@@ -216,8 +222,6 @@ void GererMouvementSouris(int x, int y) {
 
 
 int main(int argc, char *argv[]){
-    int i;
-    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_SINGLE);
 
@@ -249,32 +253,8 @@ int main(int argc, char *argv[]){
     /* aléatoire */
     srand(time(NULL));
 
-    for (i = 0; i < NB_POISSONS; i++){
-        poissons[i] = creer_poisson();
-    }
-
-    for (i = 0; i < NB_BATEAUX; i++){
-        bateaux[i] = creer_bateau();
-    }
-
-    for (i = 0; i < NB_OBSTACLES; i++){
-        obstacles[i] = creer_obstacle();
-    }
-
-
-    /* fonction... */
-    trans_rot_z_alea(&poissons[0].o.modele, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea(&poissons[1].o.modele, -15, -5, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea(&poissons[2].o.modele, 5, 15, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea(&poissons[3].o.modele, -15, -5, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
-
-    trans_rot_z_alea(&bateaux[0].o.modele, 5, 15, 5, 15, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea(&bateaux[1].o.modele, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea(&bateaux[2].o.modele, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea(&bateaux[3].o.modele, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
-
-    translation(&obstacles[0].o.modele, 0, 0, NIVEAU_MER);
-    
+    /* génération */
+    generer_monde();
     
     glutMainLoop();
     return 0;

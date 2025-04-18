@@ -12,6 +12,6 @@ void afficher_bateau(bateau b);
 void afficher_poisson(poisson p);
 void afficher_obstacle(obstacle ob);
 void affiche_eau();
-
+void generer_monde();
 
 #endif /* _AFFICHAGE_H_ */
