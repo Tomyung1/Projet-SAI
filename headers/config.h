@@ -2,7 +2,7 @@
 #define _CONFIG_H_
 
 
-#define VISION_MAX 300  /* distance maximal dont le personne peut voir */
+#define VISION_MAX 450  /* distance maximal dont le personne peut voir */
 
 /* écran */
 #define LARGUEUR 1600
@@ -21,7 +21,9 @@
 
 #define NB_POISSONS 4
 #define NB_BATEAUX 4
-#define NB_OBSTACLES 1
+#define NB_OBSTACLES 16   // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
+
+#define NB_OBST_PAR_LIGNE 4;
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */

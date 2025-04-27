@@ -255,6 +255,24 @@ void rotation_sur_place(matrice* modele, double theta, char axe){
     translation(modele, px, py, pz);
 }
 
+
+void agrandissement(matrice* modele, double facteur_x, double facteur_y, double facteur_z){
+    matrice t = creer_identite(4);
+    matrice res;
+
+    set_mat(t, 0, 0, facteur_x);
+    set_mat(t, 1, 1, facteur_y);
+    set_mat(t, 2, 2, facteur_z);
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}
+
 void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
     matrice t = creer_identite(4);
     matrice res;
@@ -264,8 +282,6 @@ void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min,
     dx = (rand() / (double)RAND_MAX) * (x_max - x_min) + x_min;
     dy = (rand() / (double)RAND_MAX) * (y_max - y_min) + y_min;
     dz = (rand() / (double)RAND_MAX) * (z_max - z_min) + z_min;
-
-    printf("angle = %lf, dx = %lf, dy = %lf, dz = %lf\n", theta, dx, dy, dz);
     
     set_mat(t, 0, 0, cos(theta));
     set_mat(t, 0, 1, -sin(theta));
@@ -295,8 +311,6 @@ void trans_rot_z_alea_2(matrice* modele, matrice* direction, double x_min, doubl
     dy = (rand() / (double)RAND_MAX) * (y_max - y_min) + y_min;
     dz = (rand() / (double)RAND_MAX) * (z_max - z_min) + z_min;
 
-    printf("angle = %lf, dx = %lf, dy = %lf, dz = %lf\n", theta, dx, dy, dz);
-    
     set_mat(t, 0, 0, cos(theta));
     set_mat(t, 0, 1, -sin(theta));
     set_mat(t, 1, 0, sin(theta));

@@ -234,12 +234,12 @@ void afficher_poisson(poisson p){
 void afficher_obstacle(obstacle ob){
     int i;
 
-    for (i = 0; i < 12; i++){
+    for (i = 0; i < 24; i++){
         dessiner_facette_triangle(ob.o.modele,
                                   regle_obstacle[i][0],
                                   regle_obstacle[i][1],
                                   regle_obstacle[i][2],
-                                  gris);
+                                  blanc);
     }
 }
 
@@ -258,14 +258,36 @@ void affiche_eau() {
     glVertex3f(LIMITE_MIN_X, LIMITE_MAX_Y, NIVEAU_MER);
      
     glEnd();
+
+    /* debug zone iceberg (si le code ne change pas dans genere_monde
+    int x, y, num_obstacle;
+    int dx, dy, larg, decalage;
+    double pourcentage;
+
+    dx = (abs(LIMITE_MIN_X) + abs(LIMITE_MAX_X)) / NB_OBST_PAR_LIGNE;
+    dy = (abs(LIMITE_MIN_Y) + abs(LIMITE_MAX_Y)) / NB_OBST_PAR_LIGNE;
+    decalage = dx / 2;
+    pourcentage = 0.7;
+    larg = decalage * pourcentage;
+    
+    num_obstacle = 0;
+    for (x = LIMITE_MIN_X; x < LIMITE_MAX_X; x += dx){
+        for (y = LIMITE_MIN_Y; y < LIMITE_MAX_Y; y += dy){
+            affiche_cube(x+decalage-larg, y+decalage-larg, 0.05, x+decalage+larg, y+decalage+larg, 0.1, poisson1, poisson1, poisson1);
+            num_obstacle++;
+        }
+    }
+    */
 }
 
 
 
 
 void generer_monde(){
-    int i;
-    
+    int i, x, y, num_obstacle;
+    int dx, dy, larg, decalage, taille;
+    double pourcentage;
+
     for (i = 0; i < NB_POISSONS; i++){
         poissons[i] = creer_poisson();
     }
@@ -278,6 +300,32 @@ void generer_monde(){
         obstacles[i] = creer_obstacle();
     }
 
+    // variable de génération
+    dx = (abs(LIMITE_MIN_X) + abs(LIMITE_MAX_X)) / NB_OBST_PAR_LIGNE;
+    dy = (abs(LIMITE_MIN_Y) + abs(LIMITE_MAX_Y)) / NB_OBST_PAR_LIGNE;
+    decalage = dx / 2;
+    pourcentage = 0.7;
+    larg = decalage * pourcentage; // pour assurer qu'il ne se chevauche pas
+    printf("Facteur maximal pour les icebergs : %d", decalage - larg);
+        
+    /* parcours de zone carré de largeur larg pour placer un obstacle par zone */
+    num_obstacle = 0;
+    for (x = LIMITE_MIN_X; x < LIMITE_MAX_X; x += dx){
+        for (y = LIMITE_MIN_Y; y < LIMITE_MAX_Y; y += dy){
+            taille = rand() % 6 + 4; // entre 4 et 9
+            agrandissement(&obstacles[num_obstacle].o.modele, taille, taille, taille);
+            trans_rot_z_alea(&obstacles[num_obstacle].o.modele,
+                             x + decalage - larg,
+                             x + decalage + larg,
+                             y + decalage - larg,
+                             y + decalage + larg,
+                             NIVEAU_MER, NIVEAU_MER);
+            affiche_cube(x+decalage-larg, y+decalage-larg, 0.05, x+decalage+larg, y+decalage+larg, 0.1, poisson1, poisson1, poisson1);
+            num_obstacle++;
+        }
+    }
+    
+
 
     /* fonction... */
     trans_rot_z_alea(&poissons[0].o.modele, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
@@ -289,6 +337,4 @@ void generer_monde(){
     trans_rot_z_alea_2(&bateaux[1].o.modele, &bateaux[1].direction, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
     trans_rot_z_alea_2(&bateaux[2].o.modele, &bateaux[2].direction, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
     trans_rot_z_alea_2(&bateaux[3].o.modele, &bateaux[3].direction, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
-
-    translation(&obstacles[0].o.modele, 0, 0, NIVEAU_MER);
 }

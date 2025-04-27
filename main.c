@@ -222,6 +222,7 @@ void GererMouvementSouris(int x, int y) {
 
 
 int main(int argc, char *argv[]){
+    
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_SINGLE);
 
