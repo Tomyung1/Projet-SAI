@@ -271,9 +271,15 @@ void affiche_eau() {
     larg = decalage * pourcentage;
     
     num_obstacle = 0;
-    for (x = LIMITE_MIN_X; x < LIMITE_MAX_X; x += dx){
-        for (y = LIMITE_MIN_Y; y < LIMITE_MAX_Y; y += dy){
-            affiche_cube(x+decalage-larg, y+decalage-larg, 0.05, x+decalage+larg, y+decalage+larg, 0.1, poisson1, poisson1, poisson1);
+    for (x = 0; x < NB_OBST_PAR_LIGNE; x++){
+        for (y = 0; y < NB_OBST_PAR_LIGNE; y++){
+            affiche_cube(LIMITE_MIN_X+x*dx+decalage-larg,
+                         LIMITE_MIN_Y+y*dy+decalage-larg,
+                         NIVEAU_MER + 0.1,
+                         LIMITE_MIN_X+x*dx+decalage+larg,
+                         LIMITE_MIN_Y+y*dy+decalage+larg,
+                         NIVEAU_MER + 0.2,
+                         poisson1, poisson1, poisson1);
             num_obstacle++;
         }
     }
@@ -307,25 +313,23 @@ void generer_monde(){
     pourcentage = 0.7;
     larg = decalage * pourcentage; // pour assurer qu'il ne se chevauche pas
     printf("Facteur maximal pour les icebergs : %d", decalage - larg);
-        
+    
     /* parcours de zone carré de largeur larg pour placer un obstacle par zone */
     num_obstacle = 0;
-    for (x = LIMITE_MIN_X; x < LIMITE_MAX_X; x += dx){
-        for (y = LIMITE_MIN_Y; y < LIMITE_MAX_Y; y += dy){
-            taille = rand() % 6 + 4; // entre 4 et 9
+    for (x = 0; x < NB_OBST_PAR_LIGNE; x++){
+        for (y = 0; y < NB_OBST_PAR_LIGNE; y++){
+            taille = rand() % 6 + 3; // entre 4 et 8
             agrandissement(&obstacles[num_obstacle].o.modele, taille, taille, taille);
             trans_rot_z_alea(&obstacles[num_obstacle].o.modele,
-                             x + decalage - larg,
-                             x + decalage + larg,
-                             y + decalage - larg,
-                             y + decalage + larg,
+                             LIMITE_MIN_X + x*dx + decalage - larg,
+                             LIMITE_MIN_X + x*dx + decalage + larg,
+                             LIMITE_MIN_Y + y*dy + decalage - larg,
+                             LIMITE_MIN_Y + y*dy + decalage + larg,
                              NIVEAU_MER, NIVEAU_MER);
-            affiche_cube(x+decalage-larg, y+decalage-larg, 0.05, x+decalage+larg, y+decalage+larg, 0.1, poisson1, poisson1, poisson1);
             num_obstacle++;
         }
     }
     
-
 
     /* fonction... */
     trans_rot_z_alea(&poissons[0].o.modele, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);

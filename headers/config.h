@@ -21,9 +21,9 @@
 
 #define NB_POISSONS 4
 #define NB_BATEAUX 4
-#define NB_OBSTACLES 16   // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
+#define NB_OBSTACLES 25   // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
 
-#define NB_OBST_PAR_LIGNE 4;
+#define NB_OBST_PAR_LIGNE 5   // modification = make clean 
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */

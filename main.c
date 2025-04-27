@@ -231,7 +231,7 @@ int main(int argc, char *argv[]){
 
     glutCreateWindow("Projet SAI");
     glEnable(GL_DEPTH_TEST);
-    
+
     /* transparence */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
