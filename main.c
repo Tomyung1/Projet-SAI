@@ -8,7 +8,7 @@
 
 #include "headers/config.h"
 #include "headers/affichage.h"
-#include "headers/action.h"
+#include "headers/collision.h"
 #include "headers/poisson.h"
 #include "headers/bateau.h"
 #include "headers/obstacle.h"
@@ -20,13 +20,12 @@
 
 
 /********************************************************
- *                Organisation                          *
+ *                    Organisation                      *
  *                                                      *
- * - définir un repère pour le joueur                   *
- *   -> rotation / déplacement du repère, camera dessus *
- *      déplacement de la souris pour tourné            *
- * - ajout libération de la mémoire à la fermeture de   *
- *   la fenêtre                                         *
+ * - Affichage hitbox obstacle                          *
+ *                                                      *
+ *                                                      *
+ *                                                      *
  *                                                      *
  ********************************************************/
 
@@ -62,7 +61,7 @@ void Affichage(){
     glFrustum(-0.12, 0.12, -0.0675, 0.0675, 0.1, VISION_MAX);
 
     if (test == 0){
-        gluLookAt(p_x, p_y, p_z, 0, 0, NIVEAU_MER, 0, 0, 1);
+        gluLookAt(p_x, p_y, p_z, 1, 1, 1, 0, 0, 1);
     }
     else {
         gluLookAt(p_x, p_y, p_z, p_x, p_y + 1, p_z, 0, 0, 1);
@@ -94,11 +93,14 @@ void Affichage(){
 
 void Animer() {
     int i, j;
-    
+    double dir_pois_x, dir_pois_y, dir_pois_z;
+
     // Déplacer tous les poissons
     for (i = 0; i < NB_POISSONS; i++) {
-        deplacer_poisson(&poissons[i]);
         
+        deplacer_poisson(&poissons[i]);
+
+        /*
         // Vérifier si un poisson est proche d'un bateau
         // Si oui, le mettre en état de fuite
         for (j = 0; j < NB_BATEAUX; j++) {
@@ -113,42 +115,51 @@ void Animer() {
             
             // Calculer la distance
             double distance = pow(poisson_x - bateau_x, 2) + 
-                                  pow(poisson_y - bateau_y, 2) + 
-                                  pow(poisson_z - bateau_z, 2);
+                              pow(poisson_y - bateau_y, 2) + 
+                              pow(poisson_z - bateau_z, 2);
             
             // Si un bateau est proche, le poisson fuit
             if (distance < 8.0 * 8.0) {
                 mettre_en_fuite(&poissons[i]);
                 
                 // Direction opposée au bateau
-                poissons[i].direction_x = poisson_x - bateau_x;
-                poissons[i].direction_y = poisson_y - bateau_y;
-                poissons[i].direction_z = poisson_z - bateau_z;
+                set_mat(poissons[i].direction, 0, 0, poisson_x - bateau_x);
+                set_mat(poissons[i].direction, 1, 0, poisson_y - bateau_y);
+                set_mat(poissons[i].direction, 2, 0, poisson_z - bateau_z);
+                
+                dir_pois_x = get_mat(poissons[i].direction, 0, 0);
+                dir_pois_y = get_mat(poissons[i].direction, 1, 0);
+                dir_pois_z = get_mat(poissons[i].direction, 2, 0);
                 
                 // Normaliser
-                double longueur = sqrt(poissons[i].direction_x * poissons[i].direction_x + 
-                                     poissons[i].direction_y * poissons[i].direction_y + 
-                                     poissons[i].direction_z * poissons[i].direction_z);
+                double longueur = sqrt(dir_pois_x * dir_pois_x +
+                                       dir_pois_y * dir_pois_y +
+                                       dir_pois_z * dir_pois_z);
                 
                 if (longueur > 0) {
-                    poissons[i].direction_x /= longueur;
-                    poissons[i].direction_y /= longueur;
-                    poissons[i].direction_z /= longueur;
+                    set_mat(poissons[i].direction, 0, 0, dir_pois_x / longueur);
+                    set_mat(poissons[i].direction, 1, 0, dir_pois_y / longueur);
+                    set_mat(poissons[i].direction, 2, 0, dir_pois_z / longueur);
+
+                    // mise à jour des variables de direction
+                    dir_pois_x = get_mat(poissons[i].direction, 0, 0);
+                    dir_pois_y = get_mat(poissons[i].direction, 1, 0);
+                    dir_pois_z = get_mat(poissons[i].direction, 2, 0);
                 }
                 
                 // Rotation pour faire face à la nouvelle direction
-                double angle = atan2(poissons[i].direction_y, poissons[i].direction_x);
+                double angle = atan2(dir_pois_y, dir_pois_x);
                 rotation_z(&poissons[i].o.modele, angle - M_PI/2); 
                 
                 break; // Un seul bateau suffit pour fuir
             }
         }
+        */
     }
-
 
     for (i = 0; i < NB_BATEAUX; i++) {
         deplacer_bateau(&bateaux[i]);
-        tourner_bateau(&bateaux[i], 'd');
+        tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
     }
     
     glutPostRedisplay();
@@ -257,6 +268,7 @@ int main(int argc, char *argv[]){
     /* génération */
     generer_monde();
     
+
     glutMainLoop();
     return 0;
 }

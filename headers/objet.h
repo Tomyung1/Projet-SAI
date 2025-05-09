@@ -10,10 +10,11 @@
 #define E_FIN 3
 
 typedef struct {
-    matrice modele;
+    matrice modele; // colonne d'indice 0 = position (centre)
     int etat;
+    matrice hitbox; // deux points définissent un pavé
 } objet;
 
-matrice lire_modele(char * chemin);
+void lire_modele(char * chemin, matrice *modele, matrice *hitbox);
 
 #endif /* _OBJET_H_ */

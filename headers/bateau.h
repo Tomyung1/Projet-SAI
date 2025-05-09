@@ -15,6 +15,6 @@ typedef struct {
 bateau creer_bateau();
 void liberer_bateau(bateau b);
 void deplacer_bateau(bateau *b);
-void tourner_bateau(bateau *b, char sens);
+void tourner_bateau(bateau *b, double theta, char sens);
 
 #endif /* _BATEAU_H_ */

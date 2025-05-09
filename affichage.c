@@ -16,7 +16,7 @@ extern bateau bateaux[NB_BATEAUX];
 extern obstacle obstacles[NB_OBSTACLES];
 
 /* palette de couleur */
-couleur blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
+couleur rouge, blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
 
 int (*regle_poisson)[3];   /* Pointeur de tableau de 3 entiers (indice */
 int (*regle_bateau)[3];    /* de sommet) utiliser pour définir les     */
@@ -78,6 +78,7 @@ static int (*charger_regles(char* fichier))[3]{
 /* initialise l'affichage, en particuler les valeurs pour les couleurs
    appeler 1 seul fois */
 void init_affichage(){
+    rouge.r  = 1;    rouge.g  = 0;    rouge.b  = 0;
     blanc.r  = 0.9;  blanc.g  = 0.9;  blanc.b  = 0.9;
     gris_c.r = 0.75; gris_c.g = 0.75; gris_c.b = 0.75;
     gris.r   = 0.6;  gris.g   = 0.6;  gris.b   = 0.6;
@@ -95,7 +96,6 @@ void init_affichage(){
     regle_poisson = charger_regles("objets/poisson.obj");
     regle_bateau = charger_regles("objets/bateau.obj");
     regle_obstacle = charger_regles("objets/obstacle.obj");
-    
 }
 
 /* affiche un pavé droit, du point en bas à gauche devant au point en haut à droite derrière */
@@ -151,7 +151,7 @@ void dessiner_facette_triangle(matrice m, int p1, int p2, int p3, couleur c){
     glVertex3f(get_mat(m, 0, p1), get_mat(m, 1, p1), get_mat(m, 2, p1));
     glVertex3f(get_mat(m, 0, p2), get_mat(m, 1, p2), get_mat(m, 2, p2));
     glVertex3f(get_mat(m, 0, p3), get_mat(m, 1, p3), get_mat(m, 2, p3));
-
+    
     glEnd();
 }
 
@@ -170,6 +170,49 @@ void dessiner_facette_carre(matrice m, int p1, int p2, int p3, int p4, couleur c
 }
 
 
+void afficher_hitbox_pave(matrice hitbox){
+    double x0, y0, z0, x1, y1, z1;
+
+    x0 = get_mat(hitbox, 0, 0);
+    y0 = get_mat(hitbox, 1, 0);
+    z0 = get_mat(hitbox, 2, 0);
+    x1 = get_mat(hitbox, 0, 1);
+    y1 = get_mat(hitbox, 1, 1);
+    z1 = get_mat(hitbox, 2, 1);
+    
+    glBegin(GL_LINES);
+
+    glColor3f(rouge.r, rouge.g, rouge.b);
+    glVertex3f(x0, y0, z0); glVertex3f(x1, y0, z0);
+    glVertex3f(x1, y0, z0); glVertex3f(x1, y1, z0);
+    glVertex3f(x1, y1, z0); glVertex3f(x0, y1, z0);
+    glVertex3f(x0, y1, z0); glVertex3f(x0, y0, z0);
+
+    glVertex3f(x0, y0, z1); glVertex3f(x1, y0, z1);
+    glVertex3f(x1, y0, z1); glVertex3f(x1, y1, z1);
+    glVertex3f(x1, y1, z1); glVertex3f(x0, y1, z1);
+    glVertex3f(x0, y1, z1); glVertex3f(x0, y0, z1);
+
+    glVertex3f(x0, y0, z0); glVertex3f(x0, y0, z1);
+    glVertex3f(x1, y0, z0); glVertex3f(x1, y0, z1);
+    glVertex3f(x1, y1, z0); glVertex3f(x1, y1, z1);
+    glVertex3f(x0, y1, z0); glVertex3f(x0, y1, z1);
+
+    glEnd();
+}
+
+static void afficher_direction(matrice modele, matrice direction){
+    glBegin(GL_LINES);
+    glColor3f(rouge.r, rouge.g, rouge.b);
+    glVertex3f(get_mat(modele, 0, 0),
+               get_mat(modele, 1, 0),
+               get_mat(modele, 2, 0));
+    glVertex3f(get_mat(modele, 0, 0) + 1 * get_mat(direction, 0, 0),
+               get_mat(modele, 1, 0) + 1 * get_mat(direction, 1, 0),
+               get_mat(modele, 2, 0) + 1 * get_mat(direction, 2, 0));
+    glEnd();
+}
+
 /* affiche le ciel */
 void affiche_ciel(){
     affiche_cube(LIMITE_MIN_X, LIMITE_MIN_Y, LIMITE_MIN_Z,
@@ -180,7 +223,7 @@ void affiche_ciel(){
 /* règle de dessin */
 void afficher_bateau(bateau b){
     int i;
-
+  
     /* coque */
     for (i = 0; i < 6; i++){
         dessiner_facette_triangle(b.o.modele,
@@ -215,6 +258,12 @@ void afficher_bateau(bateau b){
                                   regle_bateau[i][2],
                                   gris);
     }
+
+    // affichage de la hitbox
+    afficher_hitbox_pave(b.o.hitbox);
+    
+    // affichage de la direction
+    afficher_direction(b.o.modele, b.direction);
 }
 
 /* règle de dessin */
@@ -228,6 +277,12 @@ void afficher_poisson(poisson p){
                                   regle_poisson[i][2],
                                   poisson1);
     }
+
+    // affichage de la hitbox
+    afficher_hitbox_pave(p.o.hitbox);
+    
+    // affichage de la direction
+    afficher_direction(p.o.modele, p.direction);
 }
 
 /* règle de dessin */
@@ -241,6 +296,8 @@ void afficher_obstacle(obstacle ob){
                                   regle_obstacle[i][2],
                                   blanc);
     }
+
+    afficher_hitbox_pave(ob.o.hitbox);
 }
 
 
@@ -312,7 +369,7 @@ void generer_monde(){
     decalage = dx / 2;
     pourcentage = 0.7;
     larg = decalage * pourcentage; // pour assurer qu'il ne se chevauche pas
-    printf("Facteur maximal pour les icebergs : %d", decalage - larg);
+    printf("Facteur maximal pour les icebergs : %d\n", decalage - larg);
     
     /* parcours de zone carré de largeur larg pour placer un obstacle par zone */
     num_obstacle = 0;
@@ -320,25 +377,32 @@ void generer_monde(){
         for (y = 0; y < NB_OBST_PAR_LIGNE; y++){
             taille = rand() % 6 + 3; // entre 4 et 8
             agrandissement(&obstacles[num_obstacle].o.modele, taille, taille, taille);
-            trans_rot_z_alea(&obstacles[num_obstacle].o.modele,
-                             LIMITE_MIN_X + x*dx + decalage - larg,
-                             LIMITE_MIN_X + x*dx + decalage + larg,
-                             LIMITE_MIN_Y + y*dy + decalage - larg,
-                             LIMITE_MIN_Y + y*dy + decalage + larg,
-                             NIVEAU_MER, NIVEAU_MER);
+            agrandissement(&obstacles[num_obstacle].o.hitbox, taille, taille, taille);
+            trans_rot_z_alea_tout(&obstacles[num_obstacle].o.modele,
+                                  NULL,
+                                  &obstacles[num_obstacle].o.hitbox,
+                                  LIMITE_MIN_X + x*dx + decalage - larg,
+                                  LIMITE_MIN_X + x*dx + decalage + larg,
+                                  LIMITE_MIN_Y + y*dy + decalage - larg,
+                                  LIMITE_MIN_Y + y*dy + decalage + larg,
+                                  NIVEAU_MER, NIVEAU_MER);
             num_obstacle++;
         }
     }
     
 
     /* fonction... */
-    trans_rot_z_alea(&poissons[0].o.modele, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea(&poissons[1].o.modele, -15, -5, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea(&poissons[2].o.modele, 5, 15, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea(&poissons[3].o.modele, -15, -5, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
 
-    trans_rot_z_alea_2(&bateaux[0].o.modele, &bateaux[0].direction, 5, 15, 5, 15, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea_2(&bateaux[1].o.modele, &bateaux[1].direction, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea_2(&bateaux[2].o.modele, &bateaux[2].direction, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea_2(&bateaux[3].o.modele, &bateaux[3].direction, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
+    // poissons, gérérer sans orientation vertical
+    trans_rot_z_alea_tout(&poissons[0].o.modele, &poissons[0].direction, &poissons[0].o.hitbox, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    trans_rot_z_alea_tout(&poissons[1].o.modele, &poissons[1].direction, &poissons[1].o.hitbox, -15, -5, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    trans_rot_z_alea_tout(&poissons[2].o.modele, &poissons[2].direction, &poissons[2].o.hitbox, 5, 15, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    trans_rot_z_alea_tout(&poissons[3].o.modele, &poissons[3].direction, &poissons[3].o.hitbox, -15, -5, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
+    
+    // bateaux
+    trans_rot_z_alea_tout(&bateaux[0].o.modele, &bateaux[0].direction, &bateaux[0].o.hitbox, 5, 15, 5, 15, NIVEAU_MER, NIVEAU_MER);
+    trans_rot_z_alea_tout(&bateaux[1].o.modele, &bateaux[1].direction, &bateaux[1].o.hitbox, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
+    trans_rot_z_alea_tout(&bateaux[2].o.modele, &bateaux[2].direction, &bateaux[2].o.hitbox, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
+    trans_rot_z_alea_tout(&bateaux[3].o.modele, &bateaux[3].direction, &bateaux[3].o.hitbox, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
+    
 }

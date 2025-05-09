@@ -23,9 +23,16 @@ void translation(matrice* modele, double dx, double dy, double dz);
 void rotation_x(matrice* modele, double theta);
 void rotation_y(matrice* modele, double theta);
 void rotation_z(matrice* modele, double theta);
+/* vvvvvvvvvv NE MARCHE PAS vvvvvvvvvv */
+void octant_negatif(matrice* modele, matrice* direction, matrice* hitbox, int* negatif_x, int* negatif_y, int* negatif_z);
+void octant_negatif_inverse(matrice* modele, matrice* direction, matrice* hitbox, int negatif_x, int negatif_y, int negatif_z);
+void alignement_x(matrice* modele, matrice* direction, matrice* hitbox, double *theta_x, double *theta_y, int* negatif_x, int* negatif_y, int* negatif_z);
+void alignement_x_inverse(matrice* modele, matrice* direction, matrice* hitbox, double theta_x, double theta_y, int negatif_x, int negatif_y, int negatif_z);
+/* ^^^^^^^^^^ NE MARCHE PAS ^^^^^^^^^^ */
 void rotation_sur_place(matrice* modele, double theta, char axe);
 void agrandissement(matrice* modele, double facteur_x, double facteur_y, double facteur_z);
 void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
-void trans_rot_z_alea_2(matrice* modele, matrice* direction, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
-
+void trans_rot_z_alea_obstacle(matrice* modele, matrice* obstacle, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
+void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
+    
 #endif /* _MATRICE_H_ */
