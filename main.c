@@ -61,7 +61,7 @@ void Affichage(){
     glFrustum(-0.12, 0.12, -0.0675, 0.0675, 0.1, VISION_MAX);
 
     if (test == 0){
-        gluLookAt(p_x, p_y, p_z, 1, 1, 1, 0, 0, 1);
+        gluLookAt(p_x, p_y, p_z, 0, 0, NIVEAU_MER, 0, 0, 1);
     }
     else {
         gluLookAt(p_x, p_y, p_z, p_x, p_y + 1, p_z, 0, 0, 1);
@@ -92,9 +92,9 @@ void Affichage(){
 }
 
 void Animer() {
-    int i, j;
+    int i; /*, j;
     double dir_pois_x, dir_pois_y, dir_pois_z;
-
+           */
     // Déplacer tous les poissons
     for (i = 0; i < NB_POISSONS; i++) {
         

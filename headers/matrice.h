@@ -31,8 +31,6 @@ void alignement_x_inverse(matrice* modele, matrice* direction, matrice* hitbox, 
 /* ^^^^^^^^^^ NE MARCHE PAS ^^^^^^^^^^ */
 void rotation_sur_place(matrice* modele, double theta, char axe);
 void agrandissement(matrice* modele, double facteur_x, double facteur_y, double facteur_z);
-void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
-void trans_rot_z_alea_obstacle(matrice* modele, matrice* obstacle, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
 void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
     
 #endif /* _MATRICE_H_ */
