@@ -62,16 +62,24 @@ void Affichage(){
     glFrustum(-0.12, 0.12, -0.0675, 0.0675, 0.1, VISION_MAX);
 
     if (test == 0){
+        // Vue centrée
         gluLookAt(p_x, p_y, p_z, 0, 0, NIVEAU_MER, 0, 0, 1);
-    }
-    else {
-        gluLookAt(p_x, p_y, p_z, p_x, p_y + 1, p_z, 0, 0, 1);
+    } else {
+        // Vue en première personne avec rotation de la souris
+        // Calculer le point visé à partir des angles de rotation
+        double lookX = p_x + cos(angle_y) * cos(angle_z);
+        double lookY = p_y + sin(angle_y) * cos(angle_z);
+        double lookZ = p_z + sin(angle_z);
+        gluLookAt(p_x, p_y, p_z, lookX, lookY, lookZ, 0, 0, 1);
     }
         
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+<<<<<<< Updated upstream
     
     
+=======
+>>>>>>> Stashed changes
     affiche_ciel();
 
     for (i = 0; i < NB_POISSONS; i++){
@@ -148,26 +156,104 @@ void Animer() {
     
     glutPostRedisplay();
 }
-
+void GererMouvementSouris(int x, int y) {
+    // Si c'est le premier appel ou le curseur a été recentré, ignorer
+    if (souris_x_prec == -1 || souris_y_prec == -1 || 
+        (x == LARGUEUR/2 && y == HAUTEUR/2)) {
+        souris_x_prec = x;
+        souris_y_prec = y;
+        return;
+    }
+    
+    // Calculer les déplacements relatifs
+    int dx = x - souris_x_prec;
+    int dy = y - souris_y_prec;
+    
+    // Sensibilité de la souris
+    float sensibilite = 0.002;
+    
+    // Mise à jour des angles de rotation
+    angle_y += dx * sensibilite;
+    angle_z += dy * sensibilite;
+    
+    // Limiter l'angle vertical pour éviter de se retourner complètement
+    if (angle_z > M_PI/2 - 0.1)
+        angle_z = M_PI/2 - 0.1;
+    if (angle_z < -M_PI/2 + 0.1)
+        angle_z = -M_PI/2 + 0.1;
+    
+    // Recentrer le curseur
+    glutWarpPointer(LARGUEUR/2, HAUTEUR/2);
+    
+    // Mémoriser la position centrée comme précédente
+    souris_x_prec = LARGUEUR/2;
+    souris_y_prec = HAUTEUR/2;
+}
 void GererClavier(unsigned char touche, int x, int y){
     int i;
+    float vitesse_deplacement = 1.0;
+    
+    // Calculer les vecteurs de déplacement en fonction de l'orientation
+    float frontal_x = cos(angle_y) * vitesse_deplacement;
+    float frontal_y = sin(angle_y) * vitesse_deplacement;
+    float lateral_x = cos(angle_y + M_PI/2) * vitesse_deplacement;
+    float lateral_y = sin(angle_y + M_PI/2) * vitesse_deplacement;
     
     if (touche == 'q'){  /* gauche */
-        p_x -= 1;
+        if (test == 1) { // Mode première personne
+            p_x += lateral_x;
+            p_y += lateral_y;
+        } else {
+            p_x -= 1;
+        }
     } else if (touche == 'd'){  /* droite */
-        p_x += 1;
-    } else if (touche == 'z'){  /* haut */
-        p_z += 1;
-    } else if (touche == 's'){  /* bas */
-        p_z -= 1;
+        if (test == 1) { // Mode première personne
+            p_x -= lateral_x;
+            p_y -= lateral_y;
+        } else {
+            p_x += 1;
+        }
+    } else if (touche == 'z'){  /* avancer */
+        if (test == 1) { // Mode première personne
+            p_x += frontal_x;
+            p_y += frontal_y;
+        } else {
+            p_z += 1;
+        }
+    } else if (touche == 's'){  /* reculer */
+        if (test == 1) { // Mode première personne
+            p_x -= frontal_x;
+            p_y -= frontal_y;
+        } else {
+            p_z -= 1;
+        }
     } else if (touche == 'r'){
         p_y += 1;
     } else if (touche == 'f'){
         p_y -= 1;
-    } else if (touche == 'c'){  /* changer de vu */
+    } else if (touche == 'c'){  /* changer de vue */
         test = !test;
-    } else if (touche == 27){  /* quitté avec echap */
-
+        if (test) {
+            // Passer en mode première personne
+            glutSetCursor(GLUT_CURSOR_NONE);
+            glutWarpPointer(LARGUEUR/2, HAUTEUR/2);
+        } else {
+            // Passer en mode vue centrée
+            glutSetCursor(GLUT_CURSOR_INHERIT);
+        }
+    } else if (touche == 'm'){  /* toggle mode souris */
+        static int souris_active = 1;
+        souris_active = !souris_active;
+        if (souris_active) {
+            glutSetCursor(GLUT_CURSOR_NONE);
+            glutPassiveMotionFunc(GererMouvementSouris);
+            glutMotionFunc(GererMouvementSouris);
+        } else {
+            glutSetCursor(GLUT_CURSOR_INHERIT);
+            glutPassiveMotionFunc(NULL);
+            glutMotionFunc(NULL);
+        }
+    } else if (touche == 27){  /* quitter avec echap */
         for (i = 0; i < NB_POISSONS; i++){
             liberer_poisson(poissons[i]);
         }
@@ -181,7 +267,6 @@ void GererClavier(unsigned char touche, int x, int y){
         exit(EXIT_SUCCESS);
     }
 }
-
 void GererSouris(int bouton, int etat, int x, int y) {
     /* Sauvegarde de la position actuelle de la souris */
     souris_x_prec = x;
@@ -207,6 +292,7 @@ void GererSouris(int bouton, int etat, int x, int y) {
     }
 }
 
+<<<<<<< Updated upstream
 /* Fonction pour gérer les mouvements de la souris */
 void GererMouvementSouris(int x, int y) {
     /* Calcul du déplacement de la souris */
@@ -254,6 +340,8 @@ void GererMouvementSouris(int x, int y) {
     souris_y_prec = y;
 }
 
+=======
+>>>>>>> Stashed changes
 
 int main(int argc, char *argv[]){
     int i;
@@ -276,12 +364,18 @@ int main(int argc, char *argv[]){
     glutKeyboardFunc(GererClavier);
     glutMouseFunc(GererSouris);
     glutPassiveMotionFunc(GererMouvementSouris);
+    glutMotionFunc(GererMouvementSouris); 
 
-
-    /* position initial */
+    // Position initiale
     p_x = 0;
-    p_y = -30;  /* distance du centre, négatif pour reculer */
+    p_y = -30;
     p_z = 0;
+    angle_y = 0.0; // Initialisation des angles
+    angle_z = 0.0;
+    test = 1; // Mode première personne par défaut
+
+    // Masquer le curseur pour l'immersion
+    glutSetCursor(GLUT_CURSOR_NONE);
 
     /* couleur */
     init_affichage();
@@ -289,6 +383,7 @@ int main(int argc, char *argv[]){
     /* aléatoire */
     srand(time(NULL));
 
+<<<<<<< Updated upstream
     for (i = 0; i < NB_POISSONS; i++){
         poissons[i] = creer_poisson();
     }
@@ -316,6 +411,11 @@ int main(int argc, char *argv[]){
     translation(&obstacles[0].o.modele, 0, 0, NIVEAU_MER);
     
   
+=======
+    /* génération */
+    generer_monde();
+    
+>>>>>>> Stashed changes
     glutMainLoop();
     return 0;
 }
