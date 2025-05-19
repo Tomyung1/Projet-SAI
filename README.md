@@ -1,6 +1,10 @@
 # Projet SAI
 
-# Branche Tom
+# Branche Dev
+
+## Important
+
+- Il faut que NB_OBSTACLES = NB_OBST_PAR_LIGNE² (correction : init tab des obstacles, élément à NULL, test sur la taille du tableau et gérérer si non NULL dans generer
 
 ## Palette de couleur :
 

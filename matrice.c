@@ -232,7 +232,180 @@ void rotation_z(matrice* modele, double theta){
 }
 
 
-void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
+/* vvvvvvvvvv NE MARCHE PAS vvvvvvvvvv */
+
+
+// Retourne le vecteur direction dans l'octant positif
+// Si negatif_x est == -1, alors il a été nécessaire de changer le signe
+// des x dans le vecteur direction, 1 sinon. pareil pour y et z.
+void octant_negatif(matrice* modele, matrice* direction, matrice* hitbox, int* negatif_x, int* negatif_y, int* negatif_z){
+  double x, y, z;
+
+  x = get_mat(*direction, 0, 0);
+  if (x < 0){
+      printf("### 1\n");
+      *negatif_x = -1;
+      rotation_z(modele, M_PI);
+      rotation_z(direction, M_PI);
+      rotation_z(hitbox, M_PI);
+  } else {
+      *negatif_x = 1;
+  }
+  
+  y = get_mat(*direction, 1, 0);
+  if (y < 0){
+      printf("### 2\n");
+      *negatif_y = -1;
+      rotation_x(modele, M_PI);
+      rotation_x(direction, M_PI);
+      rotation_x(hitbox, M_PI);
+  } else {
+      *negatif_y = 1;
+  }
+  
+  z = get_mat(*direction, 2, 0);
+  if (z < 0){
+      printf("### 3\n");
+      *negatif_z = -1;
+      rotation_y(modele, M_PI);
+      rotation_y(direction, M_PI);
+      rotation_y(hitbox, M_PI);
+  } else {
+      *negatif_z = 1;
+  }
+}
+
+
+void octant_negatif_inverse(matrice* modele, matrice* direction, matrice* hitbox, int negatif_x, int negatif_y, int negatif_z){
+
+    if (negatif_z == -1){
+        printf("### 4\n");
+        rotation_y(modele, M_PI);
+        rotation_y(direction, M_PI);
+        rotation_y(hitbox, M_PI);
+    }
+
+    if (negatif_y == -1){
+        printf("### 5\n");
+        rotation_x(modele, M_PI);
+        rotation_x(direction, M_PI);
+        rotation_x(hitbox, M_PI);
+    }
+
+    if (negatif_x == -1){
+        printf("### 6\n");
+        rotation_z(modele, M_PI);
+        rotation_z(direction, M_PI);
+        rotation_z(hitbox, M_PI);
+    }
+}
+
+
+// ATTENTION, après cette fonction, rotation 'd' -> 'h','g' -> 'b', 'h' -> 'd', 'b' -> 'g'
+// ATTETION, FAUX, ROTATION SUR LES X NECESSAIRE SINON ACCUMULE DES ERREURS
+// aligne le modèle avec l'axe des x (attention, le résultat n'est pas forcément sur l'axe)
+void alignement_x(matrice* modele, matrice* direction, matrice* hitbox, double *theta_x, double *theta_y, int* negatif_x, int* negatif_y, int* negatif_z){
+  double x, y, z; // vecteur de direction
+  
+  octant_negatif(modele, direction, hitbox, negatif_x, negatif_y, negatif_z);
+
+  printf("%d, %d, %d\n", *negatif_x, *negatif_y, *negatif_z);
+  
+  *theta_x = 0;
+  *theta_y = 0;
+  
+  x = get_mat(*direction, 0, 0);
+  y = get_mat(*direction, 1, 0);
+  z = get_mat(*direction, 2, 0);
+
+  printf("taille   : %lf\n", sqrt(x * x + y * y + z * z));
+  
+  // alignement sur le plan 0x 0z
+  *theta_x = atan(y/z);  // trigo sur le plan 0y 0z
+
+  rotation_x(modele, *theta_x);
+  rotation_x(direction, *theta_x);
+  rotation_x(hitbox, *theta_x);
+  
+  // alignement sur x
+  x = get_mat(*direction, 0, 0);
+  z = get_mat(*direction, 2, 0);
+  
+  *theta_y = acos(x); // trigo sur 0x 0z après Rx(theta_x)
+  
+  rotation_y(modele, *theta_y);
+  rotation_y(direction, *theta_y);
+  rotation_y(hitbox, *theta_y);
+  
+  printf("%lf, %lf\n", *theta_x, *theta_y);
+}
+
+// annule l'alignement en fonction des paramètres récupérer
+void alignement_x_inverse(matrice* modele, matrice* direction, matrice* hitbox, double theta_x, double theta_y, int negatif_x, int negatif_y, int negatif_z){
+    rotation_y(modele, -theta_y);
+    rotation_y(direction, -theta_y);
+    rotation_y(hitbox, -theta_y);
+    
+    rotation_x(modele, -theta_x);
+    rotation_x(direction, -theta_x);
+    rotation_x(hitbox, -theta_x);
+
+    octant_negatif_inverse(modele, direction, hitbox, negatif_x, negatif_y, negatif_z);
+}
+
+
+/* ^^^^^^^^^^ NE MARCHE PAS ^^^^^^^^^^ */
+
+
+void rotation_sur_place(matrice* modele, double theta, char axe){
+    double px, py, pz;
+
+    px = get_mat(*modele, 0, 0);
+    py = get_mat(*modele, 1, 0);
+    pz = get_mat(*modele, 2, 0);
+
+    // translation sur (0, 0, 0)
+    translation(modele, -px, -py, -pz);
+
+    // rotation ( /!\ problème si composition )
+    switch (axe){
+    case 'x':
+        rotation_x(modele, theta);
+        break;
+    case 'y':
+        rotation_y(modele, theta);
+        break;
+    case 'z':
+        rotation_z(modele, theta);
+        break;
+    default:
+        break;
+    }
+    
+    // déplacement à son point d'origine
+    translation(modele, px, py, pz);
+}
+
+
+void agrandissement(matrice* modele, double facteur_x, double facteur_y, double facteur_z){
+    matrice t = creer_identite(4);
+    matrice res;
+
+    set_mat(t, 0, 0, facteur_x);
+    set_mat(t, 1, 1, facteur_y);
+    set_mat(t, 2, 2, facteur_z);
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}
+
+
+void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
     matrice t = creer_identite(4);
     matrice res;
     double theta, dx, dy, dz;
@@ -242,8 +415,6 @@ void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min,
     dy = (rand() / (double)RAND_MAX) * (y_max - y_min) + y_min;
     dz = (rand() / (double)RAND_MAX) * (z_max - z_min) + z_min;
 
-    printf("angle = %lf, dx = %lf, dy = %lf, dz = %lf\n", theta, dx, dy, dz);
-    
     set_mat(t, 0, 0, cos(theta));
     set_mat(t, 0, 1, -sin(theta));
     set_mat(t, 1, 0, sin(theta));
@@ -251,12 +422,38 @@ void trans_rot_z_alea(matrice* modele, double x_min, double x_max, double y_min,
     set_mat(t, 0, 3, dx);
     set_mat(t, 1, 3, dy);
     set_mat(t, 2, 3, dz);
+
+    // modèle
+    if (modele != NULL){
+        res = mult_matrice(t, *modele);
+
+        liberer_matrice(*modele);
+
+        *modele = res;
+    }
+        
+    // direction
+    if (direction != NULL){
+        res = mult_matrice(t, *direction);
     
-    res = mult_matrice(t, *modele);
+        liberer_matrice(*direction);
 
-    liberer_matrice(*modele);
+        *direction = res;
+    }
 
-    *modele = res;
+    // hitbox
+    if (hitbox != NULL){
+        set_mat(t, 0, 0, 1);   // pas de rotation
+        set_mat(t, 0, 1, 0);
+        set_mat(t, 1, 0, 0);
+        set_mat(t, 1, 1, 1);
+        
+        res = mult_matrice(t, *hitbox);
+        
+        liberer_matrice(*hitbox);
+        
+        *hitbox = res;
+    }
 
     liberer_matrice(t);
 }
