@@ -22,7 +22,7 @@
 /********************************************************
  *                    Organisation                      *
  *                                                      *
- * - Affichage hitbox obstacle                          *
+ *                                                      *
  *                                                      *
  *                                                      *
  *                                                      *
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]){
     // Position initiale
     p_x = 0;
     p_y = -30;
-    p_z = 0;
+    p_z = 60;
     angle_y = 0.0; // Initialisation des angles
     angle_z = 0.0;
     test = 1; // Mode première personne par défaut

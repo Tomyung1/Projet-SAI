@@ -12,7 +12,7 @@ poisson creer_poisson(){
     poisson p;
 
     p.o.etat = E_INITIAL;
-    lire_modele("objets/poisson.obj", &p.o.modele, &p.o.hitbox);
+    lire_modele("objets/poisson.obj", &p.o.modele, &p.o.hitbox, NULL);
     
     // Initialiser les paramètres de déplacement
     p.vitesse_normale = 0.001;  // Vitesse de base

@@ -17,7 +17,7 @@
    ordonné comme les 8-arbres pour les pavés droits
  */
 
-void lire_modele(char * chemin, matrice *modele, matrice *hitbox){
+void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbox2){
     FILE * f = NULL;
     int n; /* nombre de sommets */
     double x, y, z;
@@ -61,12 +61,14 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox){
     if (fscanf(f, "%d\n", &n) != 1){
         fprintf(stderr, "Erreur lecture modèle 3D\n");
         fclose(f);
+        liberer_matrice(*modele);
         exit(EXIT_FAILURE);        
     }
     for (i = 0; i < n; i++){
         if (fscanf(f, "%d,%d,%d\n", &f1, &f2, &f3) != 3){
             fprintf(stderr, "Erreur lecture modèle 3D\n");
             fclose(f);
+            liberer_matrice(*modele);
             exit(EXIT_FAILURE);
         }
     }
@@ -84,6 +86,8 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox){
         if (fscanf(f, "%lf,%lf,%lf\n", &x, &y, &z) != 3){
             fprintf(stderr, "Erreur lecture modèle 3D\n");
             fclose(f);
+            liberer_matrice(*modele);
+            liberer_matrice(*hitbox);
             exit(EXIT_FAILURE);
         }
         set_mat(*hitbox, 0, i, x);
@@ -91,6 +95,28 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox){
         set_mat(*hitbox, 2, i, z);
         set_mat(*hitbox, 3, i, 1);
     }
+
+    /* lecture d'une deuxième hitbox si elle existe*/
+
+    if (fscanf(f, "%d\n", &n) == 1){ // nombre de points pour la deuxième hitbox (2 pour un pavé)
+        *hitbox2 = creer_matrice(4, n);
+
+        for (i = 0; i < n; i++) {
+            if (fscanf(f, "%lf,%lf,%lf\n", &x, &y, &z) != 3){
+                fprintf(stderr, "Erreur lecture modèle 3D\n");
+                fclose(f);
+                liberer_matrice(*modele);
+                liberer_matrice(*hitbox);
+                liberer_matrice(*hitbox2);
+                exit(EXIT_FAILURE);
+            }
+            set_mat(*hitbox2, 0, i, x);
+            set_mat(*hitbox2, 1, i, y);
+            set_mat(*hitbox2, 2, i, z);
+            set_mat(*hitbox2, 3, i, 1);
+        }
+    }
+    
     
     fclose(f);
 }

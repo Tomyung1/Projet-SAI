@@ -51,6 +51,19 @@ matrice creer_matrice(int n, int m){
 }
 
 
+matrice copier_matrice(matrice m){
+    matrice res = creer_matrice(m -> n, m -> m);
+    int i, j;
+
+    for (i = 0; i < m -> n; i++){
+        for (j = 0; j < m -> m; j++){
+            set_mat(res, i, j, get_mat(m, i, j));
+        }
+    }
+    
+    return res;
+}
+
 matrice creer_identite(int n){
     matrice nouv = creer_matrice(n, n);
     int i;
@@ -405,7 +418,7 @@ void agrandissement(matrice* modele, double facteur_x, double facteur_y, double 
 }
 
 
-void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
+void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox, matrice* hitbox2, double x_min, double x_max, double y_min, double y_max, double z_min, double z_max){
     matrice t = creer_identite(4);
     matrice res;
     double theta, dx, dy, dz;
@@ -442,17 +455,25 @@ void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox,
     }
 
     // hitbox
+    set_mat(t, 0, 0, 1);   // pas de rotation
+    set_mat(t, 0, 1, 0);
+    set_mat(t, 1, 0, 0);
+    set_mat(t, 1, 1, 1);
+    
     if (hitbox != NULL){
-        set_mat(t, 0, 0, 1);   // pas de rotation
-        set_mat(t, 0, 1, 0);
-        set_mat(t, 1, 0, 0);
-        set_mat(t, 1, 1, 1);
-        
         res = mult_matrice(t, *hitbox);
         
         liberer_matrice(*hitbox);
         
         *hitbox = res;
+    }
+
+    if (hitbox2 != NULL){
+        res = mult_matrice(t, *hitbox2);
+
+        liberer_matrice(*hitbox2);
+
+        *hitbox2 = res;
     }
 
     liberer_matrice(t);

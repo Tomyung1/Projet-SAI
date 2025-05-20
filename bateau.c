@@ -12,7 +12,7 @@ bateau creer_bateau(){
     
     b.o.etat = E_INITIAL;
 
-    lire_modele("objets/bateau.obj", &b.o.modele, &b.o.hitbox);
+    lire_modele("objets/bateau.obj", &b.o.modele, &b.o.hitbox, &b.hitbox_canne);
 
     b.vitesse = 0.005;
     
@@ -27,6 +27,7 @@ void liberer_bateau(bateau b){
     liberer_matrice(b.o.modele);
     liberer_matrice(b.o.hitbox);
     liberer_matrice(b.direction);
+    liberer_matrice(b.hitbox_canne);
 }
 
 void deplacer_bateau(bateau *b){
@@ -37,6 +38,7 @@ void deplacer_bateau(bateau *b){
     
     translation(&(b -> o.modele), dx, dy, dz);
     translation(&(b -> o.hitbox), dx, dy, dz);
+    translation(&(b -> hitbox_canne), dx, dy, dz);
 }
 
 void tourner_bateau(bateau *b, double theta, char sens){

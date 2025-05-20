@@ -10,13 +10,14 @@
 #include "headers/poisson.h"
 #include "headers/bateau.h"
 #include "headers/obstacle.h"
+#include "headers/collision.h"
 
 extern poisson poissons[NB_POISSONS];
 extern bateau bateaux[NB_BATEAUX];
 extern obstacle obstacles[NB_OBSTACLES];
 
 /* palette de couleur */
-couleur rouge, blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
+couleur rouge, rose, vert, blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
 
 int (*regle_poisson)[3];   /* Pointeur de tableau de 3 entiers (indice */
 int (*regle_bateau)[3];    /* de sommet) utiliser pour définir les     */
@@ -79,19 +80,21 @@ static int (*charger_regles(char* fichier))[3]{
    appeler 1 seul fois */
 void init_affichage(){
     rouge.r  = 1;    rouge.g  = 0;    rouge.b  = 0;
+    rose.r   = 1;    rose.g   = 0;    rose.b   = 0.58;
+    vert.r   = 0;    vert.g   = 1;    vert.b   = 0;
     blanc.r  = 0.9;  blanc.g  = 0.9;  blanc.b  = 0.9;
     gris_c.r = 0.75; gris_c.g = 0.75; gris_c.b = 0.75;
     gris.r   = 0.6;  gris.g   = 0.6;  gris.b   = 0.6;
     
     poisson1.r = 0.01; poisson1.g = 0.02; poisson1.b = 0.37;
-    eau1.r = 0.00; eau1.g = 0.47; eau1.b = 0.71;
-    eau2.r = 0.00; eau2.g = 0.59; eau2.b = 0.78;
-    eau3.r = 0.00; eau3.g = 0.71; eau3.b = 0.85;
-    ciel1.r = 0.28; ciel1.g = 0.79; ciel1.b = 0.89;
-    ciel2.r = 0.56; ciel2.g = 0.88; ciel2.b = 0.94;
-    ciel3.r = 0.68; ciel3.g = 0.91; ciel3.b = 0.96;
-    bateau1.r = 0.60; bateau1.g = 0.35; bateau1.b = 0.16;
-    bateau2.r = 0.47; bateau2.g = 0.27; bateau2.b = 0.14;
+    eau1.r     = 0.00; eau1.g     = 0.47; eau1.b     = 0.71;
+    eau2.r     = 0.00; eau2.g     = 0.59; eau2.b     = 0.78;
+    eau3.r     = 0.00; eau3.g     = 0.71; eau3.b     = 0.85;
+    ciel1.r    = 0.28; ciel1.g    = 0.79; ciel1.b    = 0.89;
+    ciel2.r    = 0.56; ciel2.g    = 0.88; ciel2.b    = 0.94;
+    ciel3.r    = 0.68; ciel3.g    = 0.91; ciel3.b    = 0.96;
+    bateau1.r  = 0.60; bateau1.g  = 0.35; bateau1.b  = 0.16;
+    bateau2.r  = 0.47; bateau2.g  = 0.27; bateau2.b  = 0.14;
 
     regle_poisson = charger_regles("objets/poisson.obj");
     regle_bateau = charger_regles("objets/bateau.obj");
@@ -170,7 +173,7 @@ void dessiner_facette_carre(matrice m, int p1, int p2, int p3, int p4, couleur c
 }
 
 
-void afficher_hitbox_pave(matrice hitbox){
+void afficher_hitbox_pave(matrice hitbox, couleur c){
     double x0, y0, z0, x1, y1, z1;
 
     x0 = get_mat(hitbox, 0, 0);
@@ -182,7 +185,8 @@ void afficher_hitbox_pave(matrice hitbox){
     
     glBegin(GL_LINES);
 
-    glColor3f(rouge.r, rouge.g, rouge.b);
+    glColor3f(c.r, c.g, c.b);
+    
     glVertex3f(x0, y0, z0); glVertex3f(x1, y0, z0);
     glVertex3f(x1, y0, z0); glVertex3f(x1, y1, z0);
     glVertex3f(x1, y1, z0); glVertex3f(x0, y1, z0);
@@ -259,11 +263,15 @@ void afficher_bateau(bateau b){
                                   gris);
     }
 
-    // affichage de la hitbox
-    afficher_hitbox_pave(b.o.hitbox);
-    
+    // affichage des hitbox
+    if (AFF_HITBOX){
+        afficher_hitbox_pave(b.o.hitbox, rouge);
+        afficher_hitbox_pave(b.hitbox_canne, rose);
+    }
     // affichage de la direction
-    afficher_direction(b.o.modele, b.direction);
+    if (AFF_DIR){
+        afficher_direction(b.o.modele, b.direction);
+    }
 }
 
 /* règle de dessin */
@@ -279,10 +287,13 @@ void afficher_poisson(poisson p){
     }
 
     // affichage de la hitbox
-    afficher_hitbox_pave(p.o.hitbox);
-    
+    if (AFF_HITBOX){
+        afficher_hitbox_pave(p.o.hitbox, rouge);
+    }
     // affichage de la direction
-    afficher_direction(p.o.modele, p.direction);
+    if (AFF_DIR){
+        afficher_direction(p.o.modele, p.direction);
+    }
 }
 
 /* règle de dessin */
@@ -297,7 +308,9 @@ void afficher_obstacle(obstacle ob){
                                   blanc);
     }
 
-    afficher_hitbox_pave(ob.o.hitbox);
+    if (AFF_HITBOX){
+        afficher_hitbox_pave(ob.o.hitbox, rouge);
+    }
 }
 
 
@@ -347,9 +360,11 @@ void affiche_eau() {
 
 
 void generer_monde(){
-    int i, x, y, num_obstacle;
+    int i, j, x, y, num_obstacle;
+    int nb_tentative, test_collision, tentative_max = 15;
     int dx, dy, larg, decalage, taille;
     double pourcentage;
+    matrice copie_modele, copie_direction, copie_hitbox, copie_hitbox2;
 
     for (i = 0; i < NB_POISSONS; i++){
         poissons[i] = creer_poisson();
@@ -381,6 +396,7 @@ void generer_monde(){
             trans_rot_z_alea_tout(&obstacles[num_obstacle].o.modele,
                                   NULL,
                                   &obstacles[num_obstacle].o.hitbox,
+                                  NULL,
                                   LIMITE_MIN_X + x*dx + decalage - larg,
                                   LIMITE_MIN_X + x*dx + decalage + larg,
                                   LIMITE_MIN_Y + y*dy + decalage - larg,
@@ -391,18 +407,97 @@ void generer_monde(){
     }
     
 
-    /* fonction... */
+    // poissons, gérérer sans orientation vertical (ne rentre pas en collisions entre eux et avec les obstacles)
+    for (i = 0; i < NB_POISSONS; i++){
+        
+        nb_tentative = 0;
+        while (1) {
+            copie_modele = copier_matrice(poissons[i].o.modele);
+            copie_direction = copier_matrice(poissons[i].direction);
+            copie_hitbox = copier_matrice(poissons[i].o.hitbox);
+            
+            nb_tentative += 1;
+            x = rand() % (LIMITE_MAX_X - LIMITE_MIN_X - 20) + LIMITE_MIN_X + 10;
+            y = rand() % (LIMITE_MAX_Y - LIMITE_MIN_Y - 20) + LIMITE_MIN_Y + 10;
+            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, NULL, x, x, y, y, NIVEAU_MER - 1, NIVEAU_MER - 6);
 
-    // poissons, gérérer sans orientation vertical
-    trans_rot_z_alea_tout(&poissons[0].o.modele, &poissons[0].direction, &poissons[0].o.hitbox, 5, 15, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea_tout(&poissons[1].o.modele, &poissons[1].direction, &poissons[1].o.hitbox, -15, -5, 5, 15, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea_tout(&poissons[2].o.modele, &poissons[2].direction, &poissons[2].o.hitbox, 5, 15, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
-    trans_rot_z_alea_tout(&poissons[3].o.modele, &poissons[3].direction, &poissons[3].o.hitbox, -15, -5, -15, -5, NIVEAU_MER - 1, NIVEAU_MER - 6);
+            test_collision = 0;
+            for (j = 0; j < i && !test_collision; j++){
+                test_collision = test_collision || collisions_AABB(poissons[i].o.hitbox, poissons[j].o.hitbox);
+            }
+            for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
+                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
+            }
+            
+            // cas d'arrêt
+            if (nb_tentative >= tentative_max || !test_collision){
+                break;
+            }
+            else {
+                liberer_matrice(copie_modele);
+                liberer_matrice(copie_direction);
+                liberer_matrice(copie_hitbox);
+            }
+        }
+        
+        liberer_matrice(poissons[i].o.modele);
+        poissons[i].o.modele = copie_modele;
+        liberer_matrice(poissons[i].direction);
+        poissons[i].direction = copie_direction;
+        liberer_matrice(poissons[i].o.hitbox);
+        poissons[i].o.hitbox = copie_hitbox;
+    }
     
-    // bateaux
-    trans_rot_z_alea_tout(&bateaux[0].o.modele, &bateaux[0].direction, &bateaux[0].o.hitbox, 5, 15, 5, 15, NIVEAU_MER, NIVEAU_MER);
+    
+    // bateaux (ne rentre pas en collisions entre eux et avec les obstacles)
+    for (i = 0; i < NB_BATEAUX; i++){
+        
+        nb_tentative = 0;
+        while (1){
+            copie_modele = copier_matrice(bateaux[i].o.modele);
+            copie_direction = copier_matrice(bateaux[i].direction);
+            copie_hitbox = copier_matrice(bateaux[i].o.hitbox);
+            copie_hitbox2 = copier_matrice(bateaux[i].hitbox_canne);
+            
+            nb_tentative += 1;
+            x = rand() % (LIMITE_MAX_X - LIMITE_MIN_X - 20) + LIMITE_MIN_X + 10;
+            y = rand() % (LIMITE_MAX_Y - LIMITE_MIN_Y - 20) + LIMITE_MIN_Y + 10;
+            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, &copie_hitbox2, x, x, y, y, NIVEAU_MER, NIVEAU_MER);
+
+            test_collision = 0;
+            for (j = 0; j < i && !test_collision; j++){
+                test_collision = test_collision || collisions_AABB(copie_hitbox, bateaux[j].o.hitbox);
+            }
+            for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
+                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
+            }
+            
+            // cas d'arrêt
+            if (nb_tentative >= tentative_max || !test_collision){
+                break;
+            }
+            else {
+                liberer_matrice(copie_modele);
+                liberer_matrice(copie_direction);
+                liberer_matrice(copie_hitbox);
+                liberer_matrice(copie_hitbox2);
+            }
+        } 
+        
+        liberer_matrice(bateaux[i].o.modele);
+        bateaux[i].o.modele = copie_modele;
+        liberer_matrice(bateaux[i].direction);
+        bateaux[i].direction = copie_direction;
+        liberer_matrice(bateaux[i].o.hitbox);
+        bateaux[i].o.hitbox = copie_hitbox;
+        liberer_matrice(bateaux[i].hitbox_canne);
+        bateaux[i].hitbox_canne = copie_hitbox2;
+    }
+
+    /*
+    trans_rot_z_alea_tout(&bateaux[0].o.modele, &bateaux[0].direction, &bateaux[0].o.hitbox, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
     trans_rot_z_alea_tout(&bateaux[1].o.modele, &bateaux[1].direction, &bateaux[1].o.hitbox, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
     trans_rot_z_alea_tout(&bateaux[2].o.modele, &bateaux[2].direction, &bateaux[2].o.hitbox, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
     trans_rot_z_alea_tout(&bateaux[3].o.modele, &bateaux[3].direction, &bateaux[3].o.hitbox, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
-    
+    */
 }
