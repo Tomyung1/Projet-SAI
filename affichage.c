@@ -17,7 +17,7 @@ extern bateau bateaux[NB_BATEAUX];
 extern obstacle obstacles[NB_OBSTACLES];
 
 /* palette de couleur */
-couleur rouge, vert, blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
+couleur rouge, rose, vert, blanc, gris_c, gris, poisson1, eau1, eau2, eau3, ciel1, ciel2, ciel3, bateau1, bateau2;
 
 int (*regle_poisson)[3];   /* Pointeur de tableau de 3 entiers (indice */
 int (*regle_bateau)[3];    /* de sommet) utiliser pour définir les     */
@@ -80,6 +80,7 @@ static int (*charger_regles(char* fichier))[3]{
    appeler 1 seul fois */
 void init_affichage(){
     rouge.r  = 1;    rouge.g  = 0;    rouge.b  = 0;
+    rose.r   = 1;    rose.g   = 0;    rose.b   = 0.58;
     vert.r   = 0;    vert.g   = 1;    vert.b   = 0;
     blanc.r  = 0.9;  blanc.g  = 0.9;  blanc.b  = 0.9;
     gris_c.r = 0.75; gris_c.g = 0.75; gris_c.b = 0.75;
@@ -262,8 +263,9 @@ void afficher_bateau(bateau b){
                                   gris);
     }
 
-    // affichage de la hitbox
+    // affichage des hitbox
     afficher_hitbox_pave(b.o.hitbox, rouge);
+    afficher_hitbox_pave(b.hitbox_canne, rose);
     
     // affichage de la direction
     afficher_direction(b.o.modele, b.direction);
@@ -354,7 +356,7 @@ void generer_monde(){
     int nb_tentative, test_collision, tentative_max = 15;
     int dx, dy, larg, decalage, taille;
     double pourcentage;
-    matrice copie_modele, copie_direction, copie_hitbox;
+    matrice copie_modele, copie_direction, copie_hitbox, copie_hitbox2;
 
     for (i = 0; i < NB_POISSONS; i++){
         poissons[i] = creer_poisson();
@@ -386,6 +388,7 @@ void generer_monde(){
             trans_rot_z_alea_tout(&obstacles[num_obstacle].o.modele,
                                   NULL,
                                   &obstacles[num_obstacle].o.hitbox,
+                                  NULL,
                                   LIMITE_MIN_X + x*dx + decalage - larg,
                                   LIMITE_MIN_X + x*dx + decalage + larg,
                                   LIMITE_MIN_Y + y*dy + decalage - larg,
@@ -408,7 +411,7 @@ void generer_monde(){
             nb_tentative += 1;
             x = rand() % (LIMITE_MAX_X - LIMITE_MIN_X - 20) + LIMITE_MIN_X + 10;
             y = rand() % (LIMITE_MAX_Y - LIMITE_MIN_Y - 20) + LIMITE_MIN_Y + 10;
-            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, x, x, y, y, NIVEAU_MER - 1, NIVEAU_MER - 6);
+            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, NULL, x, x, y, y, NIVEAU_MER - 1, NIVEAU_MER - 6);
 
             test_collision = 0;
             for (j = 0; j < i && !test_collision; j++){
@@ -446,11 +449,12 @@ void generer_monde(){
             copie_modele = copier_matrice(bateaux[i].o.modele);
             copie_direction = copier_matrice(bateaux[i].direction);
             copie_hitbox = copier_matrice(bateaux[i].o.hitbox);
+            copie_hitbox2 = copier_matrice(bateaux[i].hitbox_canne);
             
             nb_tentative += 1;
             x = rand() % (LIMITE_MAX_X - LIMITE_MIN_X - 20) + LIMITE_MIN_X + 10;
             y = rand() % (LIMITE_MAX_Y - LIMITE_MIN_Y - 20) + LIMITE_MIN_Y + 10;
-            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, x, x, y, y, NIVEAU_MER, NIVEAU_MER);
+            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, &copie_hitbox2, x, x, y, y, NIVEAU_MER, NIVEAU_MER);
 
             test_collision = 0;
             for (j = 0; j < i && !test_collision; j++){
@@ -468,6 +472,7 @@ void generer_monde(){
                 liberer_matrice(copie_modele);
                 liberer_matrice(copie_direction);
                 liberer_matrice(copie_hitbox);
+                liberer_matrice(copie_hitbox2);
             }
         } 
         
@@ -477,6 +482,8 @@ void generer_monde(){
         bateaux[i].direction = copie_direction;
         liberer_matrice(bateaux[i].o.hitbox);
         bateaux[i].o.hitbox = copie_hitbox;
+        liberer_matrice(bateaux[i].hitbox_canne);
+        bateaux[i].hitbox_canne = copie_hitbox2;
     }
 
     /*

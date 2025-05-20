@@ -10,6 +10,7 @@ typedef struct {
     objet o;
     double vitesse;
     matrice direction;
+    matrice hitbox_canne;
 } bateau;
 
 bateau creer_bateau();

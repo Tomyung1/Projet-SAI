@@ -11,7 +11,7 @@ obstacle creer_obstacle(){
     
     ob.o.etat = E_INITIAL;
 
-    lire_modele("objets/obstacle.obj", &ob.o.modele, &ob.o.hitbox);
+    lire_modele("objets/obstacle.obj", &ob.o.modele, &ob.o.hitbox, NULL);
     
     return ob;
 }

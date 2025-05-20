@@ -15,6 +15,6 @@ typedef struct {
     matrice hitbox; // deux points définissent un pavé
 } objet;
 
-void lire_modele(char * chemin, matrice *modele, matrice *hitbox);
+void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbox2);
 
 #endif /* _OBJET_H_ */
