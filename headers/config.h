@@ -23,7 +23,12 @@
 #define NB_BATEAUX 10
 #define NB_OBSTACLES 4    // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
 
-#define NB_OBST_PAR_LIGNE 2   // modification = make clean 
+#define NB_OBST_PAR_LIGNE 2   // modification = make clean
+
+/* debug */
+#define AFF_HITBOX 1 // si != 0, on affiche les hitbox
+#define AFF_DIR 1    // si != 0, on affiche les directions
+
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */

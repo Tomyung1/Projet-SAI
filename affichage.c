@@ -264,11 +264,14 @@ void afficher_bateau(bateau b){
     }
 
     // affichage des hitbox
-    afficher_hitbox_pave(b.o.hitbox, rouge);
-    afficher_hitbox_pave(b.hitbox_canne, rose);
-    
+    if (AFF_HITBOX){
+        afficher_hitbox_pave(b.o.hitbox, rouge);
+        afficher_hitbox_pave(b.hitbox_canne, rose);
+    }
     // affichage de la direction
-    afficher_direction(b.o.modele, b.direction);
+    if (AFF_DIR){
+        afficher_direction(b.o.modele, b.direction);
+    }
 }
 
 /* règle de dessin */
@@ -284,10 +287,13 @@ void afficher_poisson(poisson p){
     }
 
     // affichage de la hitbox
-    afficher_hitbox_pave(p.o.hitbox, rouge);
-    
+    if (AFF_HITBOX){
+        afficher_hitbox_pave(p.o.hitbox, rouge);
+    }
     // affichage de la direction
-    afficher_direction(p.o.modele, p.direction);
+    if (AFF_DIR){
+        afficher_direction(p.o.modele, p.direction);
+    }
 }
 
 /* règle de dessin */
@@ -302,7 +308,9 @@ void afficher_obstacle(obstacle ob){
                                   blanc);
     }
 
-    afficher_hitbox_pave(ob.o.hitbox, rouge);
+    if (AFF_HITBOX){
+        afficher_hitbox_pave(ob.o.hitbox, rouge);
+    }
 }
 
 
