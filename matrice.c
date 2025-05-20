@@ -51,6 +51,19 @@ matrice creer_matrice(int n, int m){
 }
 
 
+matrice copier_matrice(matrice m){
+    matrice res = creer_matrice(m -> n, m -> m);
+    int i, j;
+
+    for (i = 0; i < m -> n; i++){
+        for (j = 0; j < m -> m; j++){
+            set_mat(res, i, j, get_mat(m, i, j));
+        }
+    }
+    
+    return res;
+}
+
 matrice creer_identite(int n){
     matrice nouv = creer_matrice(n, n);
     int i;

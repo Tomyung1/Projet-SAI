@@ -11,9 +11,10 @@ typedef matrice_s* matrice;
 
 
 matrice creer_matrice(int n, int m);
+matrice copier_matrice(matrice m);
 matrice creer_identite(int n);
 void liberer_matrice(matrice m);
-
+    
 void set_mat(matrice m, int l, int c, double v);
 double get_mat(matrice m, int l, int c);
 matrice mult_matrice(matrice m1, matrice m2);

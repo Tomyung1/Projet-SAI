@@ -22,7 +22,7 @@
 /********************************************************
  *                    Organisation                      *
  *                                                      *
- * - Affichage hitbox obstacle                          *
+ *                                                      *
  *                                                      *
  *                                                      *
  *                                                      *
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]){
     /* position initial */
     p_x = 0;
     p_y = -30;  /* distance du centre, négatif pour reculer */
-    p_z = 0;
+    p_z = 60;
 
     /* couleur */
     init_affichage();
