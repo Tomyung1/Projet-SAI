@@ -120,3 +120,20 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
     
     fclose(f);
 }
+
+
+double distance_carre_modele(matrice modele1, matrice modele2){
+    double x1 = get_mat(modele1, 0, 0);
+    double y1 = get_mat(modele1, 1, 0);
+    double z1 = get_mat(modele1, 2, 0);
+    
+    double x2 = get_mat(modele2, 0, 0);
+    double y2 = get_mat(modele2, 1, 0);
+    double z2 = get_mat(modele2, 2, 0);
+
+    double x = x2 - x1;
+    double y = y2 - y1;
+    double z = z2 - z1;
+    
+    return x * x + y * y + z * z;
+}

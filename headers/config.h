@@ -19,11 +19,14 @@
 /* niveau de la mer (fixe, peut représenter la moyenne s'il y a des vagues) */
 #define NIVEAU_MER -5
 
-#define NB_POISSONS 100
-#define NB_BATEAUX 10
+#define NB_POISSONS 3
+#define NB_BATEAUX 1
 #define NB_OBSTACLES 4    // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
 
 #define NB_OBST_PAR_LIGNE 2   // modification = make clean
+
+/* calcul */
+#define DIST_CALCUL_COLLISION_CARRE 400 // distance au carré entre 2 objet avant de calculer leur collision
 
 /* debug */
 #define AFF_HITBOX 1 // si != 0, on affiche les hitbox

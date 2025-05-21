@@ -51,22 +51,6 @@ int bouton_presse = 0;   /* État des boutons de la souris */
 
 
 
-void Calcul_collisions(){
-    int i, j;
-
-    // collisions des bateaux
-  
-
-
-
-
-
-    // collisions des poissons
-    
-    
-}
-
-
 
 void Affichage(){
     int i;
@@ -114,14 +98,35 @@ void Affichage(){
 }
 
 void Animer() {
-    int i; /*, j;
+    int i, j;
+    /*
     double dir_pois_x, dir_pois_y, dir_pois_z;
-           */
-    // Déplacer tous les poissons
+    */
+    
+    // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
-        
+
+        // déplacement des poissons
         deplacer_poisson(&poissons[i]);
 
+        // Collisions poissons - obstacles
+        for (j = 0; j < NB_OBSTACLES; j++){
+            if (distance_carre_modele(poissons[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_AABB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
+                    printf("collision poisson %d et obstacle %d\n", i, j);
+                }
+            }
+        }
+
+        // Collisions poissons - canne à pêche bateaux
+        for (j = 0; j < NB_BATEAUX; j++){
+            if (distance_carre_modele(poissons[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_AABB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
+                    printf("collisions poisson %d et obstacle %d\n", i, j);
+                }
+            }
+        }
+        
         /*
         // Vérifier si un poisson est proche d'un bateau
         // Si oui, le mettre en état de fuite
@@ -180,8 +185,19 @@ void Animer() {
     }
 
     for (i = 0; i < NB_BATEAUX; i++) {
+
+        // déplacement des bateaux
         deplacer_bateau(&bateaux[i]);
         tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
+
+        // collisions bateaux - obstacles
+        for (j = 0; j < NB_OBSTACLES; j++){
+            if (distance_carre_modele(bateaux[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_AABB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
+                    printf("collisions bateaux %d et obstacle %d\n", i, j);
+                }
+            }
+        }
     }
     
     glutPostRedisplay();

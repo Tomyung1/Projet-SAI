@@ -16,5 +16,6 @@ typedef struct {
 } objet;
 
 void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbox2);
+double distance_carre_modele(matrice modele1, matrice modele2);
 
 #endif /* _OBJET_H_ */
