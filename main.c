@@ -107,17 +107,26 @@ void Animer() {
 
 
 
-    // ATTENTION MANQUE LES COLLISIONS ENTRE EUX MÊME
     // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
 
         // déplacement des poissons
         deplacer_poisson(&poissons[i]);
 
+
+        // Collisions poissons - poissons
+        for (j = i+1; j < NB_POISSONS; j++){
+            if (distance_carre_modele(poissons[i].o.modele, poissons[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_OBB(poissons[i].o.hitbox, poissons[j].o.hitbox)){
+                    printf("collision poisson %d et poisson %d\n", i, j);
+                }
+            }
+        }
+        
         // Collisions poissons - obstacles
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(poissons[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
-                if (collisions_AABB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
+                if (collisions_OBB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
                     printf("collision poisson %d et obstacle %d\n", i, j);
                 }
             }
@@ -126,7 +135,7 @@ void Animer() {
         // Collisions poissons - canne à pêche bateaux
         for (j = 0; j < NB_BATEAUX; j++){
             if (distance_carre_modele(poissons[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
-                if (collisions_AABB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
+                if (collisions_OBB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
                     printf("collisions poisson %d et obstacle %d\n", i, j);
                 }
             }
@@ -195,10 +204,18 @@ void Animer() {
         deplacer_bateau(&bateaux[i]);
         tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
 
+        // collisions bateaux bateaux
+        for (j = i+1; j < NB_BATEAUX; j++){
+            if (distance_carre_modele(bateaux[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_OBB(bateaux[i].o.hitbox, bateaux[j].o.hitbox)){
+                    printf("collision bateau %d et bateau %d\n", i, j);
+                }
+            }
+        }
         // collisions bateaux - obstacles
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(bateaux[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
-                if (collisions_AABB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
+                if (collisions_OBB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
                     printf("collisions bateaux %d et obstacle %d\n", i, j);
                 }
             }

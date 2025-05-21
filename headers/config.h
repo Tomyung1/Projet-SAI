@@ -19,8 +19,8 @@
 /* niveau de la mer (fixe, peut représenter la moyenne s'il y a des vagues) */
 #define NIVEAU_MER -5
 
-#define NB_POISSONS 3
-#define NB_BATEAUX 1
+#define NB_POISSONS 100
+#define NB_BATEAUX 20
 #define NB_OBSTACLES 4    // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
 
 #define NB_OBST_PAR_LIGNE 2   // modification = make clean
