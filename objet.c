@@ -117,7 +117,6 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
         }
     }
     
-    
     fclose(f);
 }
 

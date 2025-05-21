@@ -14,4 +14,5 @@ void afficher_obstacle(obstacle ob);
 void affiche_eau();
 void generer_monde();
 
+
 #endif /* _AFFICHAGE_H_ */

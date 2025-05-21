@@ -22,10 +22,10 @@
 /********************************************************
  *                    Organisation                      *
  *                                                      *
- * - Calcul et stratégie de collisions                  *
  * - Collisions OBB + rotation des hitbox               *
  * - Contrôler un bateau                                *
  * - Commencer le jeu avec un score par bateau          *
+ *                                                      *
  *                                                      *
  ********************************************************/
 
@@ -89,6 +89,7 @@ void Affichage(){
     for (i = 0; i < NB_OBSTACLES; i++){
         afficher_obstacle(obstacles[i]);
     }
+
     
     /* afficher les transparent à la fin */
     affiche_eau();
@@ -101,8 +102,12 @@ void Animer() {
     int i, j;
     /*
     double dir_pois_x, dir_pois_y, dir_pois_z;
-    */
+    */  
     
+
+
+
+    // ATTENTION MANQUE LES COLLISIONS ENTRE EUX MÊME
     // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
 
@@ -313,10 +318,7 @@ void GererClavier(unsigned char touche, int x, int y){
         }
         
         exit(EXIT_SUCCESS);
-    } else if (touche == 't'){
-        rotation_sur_place(&bateaux[0].o.modele, M_PI / 4, 'z');
-        translation(&bateaux[1].o.modele, 1, 0, 0);
-    }
+    }    
 }
 
 void GererSouris(int bouton, int etat, int x, int y) {
@@ -384,7 +386,7 @@ int main(int argc, char *argv[]){
     srand(time(NULL));
 
     /* génération */
-    generer_monde();
+    generer_monde();    
     
     glutMainLoop();
     return 0;

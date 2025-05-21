@@ -12,7 +12,7 @@
 typedef struct {
     matrice modele; // colonne d'indice 0 = position (centre)
     int etat;
-    matrice hitbox; // deux points définissent un pavé
+    matrice hitbox; // centre de la hitbox + 8 points d'un pavé droit
 } objet;
 
 void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbox2);
