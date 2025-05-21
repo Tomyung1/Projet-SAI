@@ -22,10 +22,10 @@
 /********************************************************
  *                    Organisation                      *
  *                                                      *
- *                                                      *
- *                                                      *
- *                                                      *
- *                                                      *
+ * - Calcul et stratégie de collisions                  *
+ * - Collisions OBB + rotation des hitbox               *
+ * - Contrôler un bateau                                *
+ * - Commencer le jeu avec un score par bateau          *
  *                                                      *
  ********************************************************/
 
@@ -48,6 +48,23 @@ int bouton_presse = 0;   /* État des boutons de la souris */
 
 
 /* x : largeur, y : profondeur, z : hauteur */
+
+
+
+void Calcul_collisions(){
+    int i, j;
+
+    // collisions des bateaux
+  
+
+
+
+
+
+    // collisions des poissons
+    
+    
+}
 
 
 
@@ -180,8 +197,8 @@ void GererMouvementSouris(int x, int y) {
     }
     
     // Calculer les déplacements relatifs
-    int dx = x - souris_x_prec;
-    int dy = y - souris_y_prec;
+    int dx = souris_x_prec - x;
+    int dy = souris_y_prec - y;
     
     // Sensibilité de la souris
     float sensibilite = 0.002;
