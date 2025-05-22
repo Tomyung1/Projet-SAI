@@ -465,48 +465,6 @@ void generer_monde(){
         }
     }
     
-
-    // poissons, gérérer sans orientation vertical (ne rentre pas en collisions entre eux et avec les obstacles)
-    for (i = 0; i < NB_POISSONS; i++){
-        
-        nb_tentative = 0;
-        while (1) {
-            copie_modele = copier_matrice(poissons[i].o.modele);
-            copie_direction = copier_matrice(poissons[i].direction);
-            copie_hitbox = copier_matrice(poissons[i].o.hitbox);
-            
-            nb_tentative += 1;
-            x = rand() % (LIMITE_MAX_X - LIMITE_MIN_X - 20) + LIMITE_MIN_X + 10;
-            y = rand() % (LIMITE_MAX_Y - LIMITE_MIN_Y - 20) + LIMITE_MIN_Y + 10;
-            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, NULL, x, x, y, y, NIVEAU_MER - 1, NIVEAU_MER - 6);
-
-            test_collision = 0;
-            for (j = 0; j < i && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(poissons[i].o.hitbox, poissons[j].o.hitbox);
-            }
-            for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
-            }
-            
-            // cas d'arrêt
-            if (nb_tentative >= tentative_max || !test_collision){
-                break;
-            }
-            else {
-                liberer_matrice(copie_modele);
-                liberer_matrice(copie_direction);
-                liberer_matrice(copie_hitbox);
-            }
-        }
-        
-        liberer_matrice(poissons[i].o.modele);
-        poissons[i].o.modele = copie_modele;
-        liberer_matrice(poissons[i].direction);
-        poissons[i].direction = copie_direction;
-        liberer_matrice(poissons[i].o.hitbox);
-        poissons[i].o.hitbox = copie_hitbox;
-    }
-    
     
     // bateaux (ne rentre pas en collisions entre eux et avec les obstacles)
     for (i = 0; i < NB_BATEAUX; i++){
@@ -524,9 +482,11 @@ void generer_monde(){
             trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, &copie_hitbox2, x, x, y, y, NIVEAU_MER, NIVEAU_MER);
 
             test_collision = 0;
+            // collisions bateau - bateau
             for (j = 0; j < i && !test_collision; j++){
                 test_collision = test_collision || collisions_AABB(copie_hitbox, bateaux[j].o.hitbox);
             }
+            // collision bateau - obstacle
             for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
                 test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
             }
@@ -553,10 +513,51 @@ void generer_monde(){
         bateaux[i].hitbox_canne = copie_hitbox2;
     }
 
-    /*
-    trans_rot_z_alea_tout(&bateaux[0].o.modele, &bateaux[0].direction, &bateaux[0].o.hitbox, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea_tout(&bateaux[1].o.modele, &bateaux[1].direction, &bateaux[1].o.hitbox, -15, -5, 5, 15, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea_tout(&bateaux[2].o.modele, &bateaux[2].direction, &bateaux[2].o.hitbox, 5, 15, -15, -5, NIVEAU_MER, NIVEAU_MER);
-    trans_rot_z_alea_tout(&bateaux[3].o.modele, &bateaux[3].direction, &bateaux[3].o.hitbox, -15, -5, -15, -5, NIVEAU_MER, NIVEAU_MER);
-    */
+    
+    // poissons, gérérer sans orientation vertical (ne rentre pas en collisions entre eux et avec les obstacles)
+    for (i = 0; i < NB_POISSONS; i++){
+        
+        nb_tentative = 0;
+        while (1) {
+            copie_modele = copier_matrice(poissons[i].o.modele);
+            copie_direction = copier_matrice(poissons[i].direction);
+            copie_hitbox = copier_matrice(poissons[i].o.hitbox);
+            
+            nb_tentative += 1;
+            x = rand() % (LIMITE_MAX_X - LIMITE_MIN_X - 20) + LIMITE_MIN_X + 10;
+            y = rand() % (LIMITE_MAX_Y - LIMITE_MIN_Y - 20) + LIMITE_MIN_Y + 10;
+            trans_rot_z_alea_tout(&copie_modele, &copie_direction, &copie_hitbox, NULL, x, x, y, y, NIVEAU_MER - 1, NIVEAU_MER - 6);
+
+            test_collision = 0;
+            // collision poisson - poisson
+            for (j = 0; j < i && !test_collision; j++){
+                test_collision = test_collision || collisions_AABB(poissons[i].o.hitbox, poissons[j].o.hitbox);
+            }
+            // collision poisson - obstacle
+            for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
+                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
+            }
+            // collision poisson - canne
+            for (j = 0; j < NB_BATEAUX && !test_collision; j++){
+                test_collision = test_collision || collisions_OBB(poissons[i].o.hitbox, bateaux[j].hitbox_canne);
+            }
+            
+            // cas d'arrêt
+            if (nb_tentative >= tentative_max || !test_collision){
+                break;
+            }
+            else {
+                liberer_matrice(copie_modele);
+                liberer_matrice(copie_direction);
+                liberer_matrice(copie_hitbox);
+            }
+        }
+        
+        liberer_matrice(poissons[i].o.modele);
+        poissons[i].o.modele = copie_modele;
+        liberer_matrice(poissons[i].direction);
+        poissons[i].direction = copie_direction;
+        liberer_matrice(poissons[i].o.hitbox);
+        poissons[i].o.hitbox = copie_hitbox;
+    }
 }

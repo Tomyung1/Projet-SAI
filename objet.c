@@ -79,8 +79,6 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
         fclose(f);
         exit(EXIT_FAILURE);        
     }
-
-    printf("avant\n");
     
     *hitbox = creer_matrice(4, n+1);
     
@@ -104,8 +102,6 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
     }
 
     /* lecture d'une deuxième hitbox si elle existe*/
-
-    printf("après1\n");
 
 
     if (fscanf(f, "%d\n", &n) == 1){ // nombre de points pour la deuxième hitbox (2 pour un pavé)
@@ -131,10 +127,6 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
             set_mat(*hitbox2, 3, i, 1);
         }
     }
-
-    
-    printf("après2\n");
-
     
     fclose(f);
 }
