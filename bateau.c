@@ -115,7 +115,7 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
     static int phase_evitement[NB_BATEAUX] = {0}; // 0: normal, 1: contournement, 2: retour
     static int bateau_id = 0;
     
-    // Vérifier les limites du monde AVANT tout
+    // Vérifier les limites du monde 
     double bateau_x = get_mat(b->o.modele, 0, 0);
     double bateau_y = get_mat(b->o.modele, 1, 0);
     

@@ -281,8 +281,9 @@ void affiche_ciel(){
 }
 
 /* règle de dessin */
-void afficher_bateau(bateau b){
+void afficher_bateau(bateau b,int est_joueur){
     int i;
+    couleur couleur_coque = est_joueur ? vert : bateau2;
   
     /* coque */
     for (i = 0; i < 6; i++){
@@ -290,7 +291,7 @@ void afficher_bateau(bateau b){
                                   regle_bateau[i][0],
                                   regle_bateau[i][1],
                                   regle_bateau[i][2],
-                                  bateau2);
+                                  couleur_coque);
     }
     
     for (i = 6; i < 8; i++){
@@ -298,7 +299,7 @@ void afficher_bateau(bateau b){
                                   regle_bateau[i][0],
                                   regle_bateau[i][1],
                                   regle_bateau[i][2],
-                                  bateau1);
+                                  est_joueur ? vert : bateau1);
     }
     
     /* cabine */
