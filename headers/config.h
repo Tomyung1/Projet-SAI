@@ -27,11 +27,12 @@
 
 /* calcul */
 #define DIST_CALCUL_COLLISION_CARRE 400 // distance au carré entre 2 objet avant de calculer leur collision
-/* distance de détection d'obstacles pour les bateaux */
-#define DISTANCE_DETECTION_BATEAU 15.0
-#define ANGLE_CONE_DETECTION (M_PI/3)  // 60 degrés
-#define DUREE_EVITEMENT 120 
 
+/* Paramètres d'évitement pour les bateaux */
+#define DISTANCE_DETECTION_BATEAU 20.0
+#define MARGE_LIMITE_MONDE 10.0
+#define DUREE_EVITEMENT_OBSTACLE 90
+#define ANGLE_EVITEMENT (M_PI/3)  // 60 degrés
 /* debug */
 #define AFF_HITBOX 1 // si != 0, on affiche les hitbox
 #define AFF_DIR 1    // si != 0, on affiche les directions
