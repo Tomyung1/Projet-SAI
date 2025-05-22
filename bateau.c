@@ -103,6 +103,8 @@ int detecter_obstacle_devant(bateau *b, obstacle *obstacles, int nb_obstacles) {
 void changer_direction_bateau(bateau *b, double angle) {
     rotation_z(&(b->direction), angle);
     rotation_sur_place(&(b->o.modele), angle, 'z');
+    rotation_sur_place(&(b->o.hitbox), angle, 'z');
+    rotation_sur_place(&(b->o.hitbox_canne), angle, 'z');
 }
 
 // Fonction principale d'évitement d'obstacles 
@@ -128,6 +130,7 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
         double longueur = sqrt(vers_centre_x * vers_centre_x + vers_centre_y * vers_centre_y);
         
         if (longueur > 0) {
+            // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
             set_mat(b->direction, 0, 0, vers_centre_x / longueur);
             set_mat(b->direction, 1, 0, vers_centre_y / longueur);
             temps_evitement[bateau_id] = 60;
@@ -153,6 +156,7 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
             double nouveau_x = dir_actuelle_x * cos(petit_angle) - dir_actuelle_y * sin(petit_angle);
             double nouveau_y = dir_actuelle_x * sin(petit_angle) + dir_actuelle_y * cos(petit_angle);
             
+            // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
             set_mat(b->direction, 0, 0, nouveau_x);
             set_mat(b->direction, 1, 0, nouveau_y);
             
@@ -173,6 +177,7 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
             
             // Normaliser
             double longueur = sqrt(nouveau_x * nouveau_x + nouveau_y * nouveau_y);
+            // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
             if (longueur > 0) {
                 set_mat(b->direction, 0, 0, nouveau_x / longueur);
                 set_mat(b->direction, 1, 0, nouveau_y / longueur);

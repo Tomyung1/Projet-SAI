@@ -62,7 +62,9 @@ void deplacer_poisson(poisson *p) {
     double pos_x = get_mat(p->o.modele, 0, 0);
     double pos_y = get_mat(p->o.modele, 1, 0);
     double pos_z = get_mat(p->o.modele, 2, 0);
-    
+
+
+    // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER 
     if (pos_x > LIMITE_MAX_X - 5 || pos_x < LIMITE_MIN_X + 5) {
         set_mat(p->direction, 0, 0, -get_mat(p->direction, 0, 0));
     }
@@ -83,18 +85,22 @@ void tourner_poisson(poisson *p, double theta, char sens) {
     case 'g':   // gauche
         rotation_sur_place(&(p -> o.modele), theta, 'z');
         rotation_z(&(p -> direction), theta);
+        rotation_sur_place(&(p -> o.hitbox), theta, 'z');
         break;
     case 'd':   // droite
         rotation_sur_place(&(p -> o.modele), -theta, 'z');
         rotation_z(&(p -> direction), -theta);
+        rotation_sur_place(&(p -> o.hitbox), -theta, 'z');
         break;
     case 'h':   // haut
         rotation_sur_place(&(p -> o.modele), theta, 'y');
         rotation_y(&(p -> direction), theta);
+        rotation_sur_place(&(p -> o.medele, theta, 'y');
         break; 
     case 'b':   // bas
         rotation_sur_place(&(p -> o.modele), -theta, 'y');
         rotation_y(&(p -> direction), -theta);
+        rotation_sur_place(&(p -> o.medele, -theta, 'y');
         break;
     default:
         break;

@@ -132,6 +132,7 @@ void Animer() {
                                        dir_pois_z * dir_pois_z);
                 
                 if (longueur > 0) {
+                    // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
                     set_mat(poissons[i].direction, 0, 0, dir_pois_x / longueur);
                     set_mat(poissons[i].direction, 1, 0, dir_pois_y / longueur);
                     set_mat(poissons[i].direction, 2, 0, dir_pois_z / longueur);
