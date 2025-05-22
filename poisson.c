@@ -95,12 +95,12 @@ void tourner_poisson(poisson *p, double theta, char sens) {
     case 'h':   // haut
         rotation_sur_place(&(p -> o.modele), theta, 'y');
         rotation_y(&(p -> direction), theta);
-        rotation_sur_place(&(p -> o.medele, theta, 'y');
+        rotation_sur_place(&(p -> o.modele), theta, 'y');
         break; 
     case 'b':   // bas
         rotation_sur_place(&(p -> o.modele), -theta, 'y');
         rotation_y(&(p -> direction), -theta);
-        rotation_sur_place(&(p -> o.medele, -theta, 'y');
+        rotation_sur_place(&(p -> o.modele), -theta, 'y');
         break;
     default:
         break;

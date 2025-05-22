@@ -104,7 +104,7 @@ void changer_direction_bateau(bateau *b, double angle) {
     rotation_z(&(b->direction), angle);
     rotation_sur_place(&(b->o.modele), angle, 'z');
     rotation_sur_place(&(b->o.hitbox), angle, 'z');
-    rotation_sur_place(&(b->o.hitbox_canne), angle, 'z');
+    rotation_sur_place(&(b->hitbox_canne), angle, 'z');
 }
 
 // Fonction principale d'évitement d'obstacles 
