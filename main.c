@@ -22,10 +22,10 @@
 /********************************************************
  *                    Organisation                      *
  *                                                      *
- * - Calcul et stratégie de collisions                  *
  * - Collisions OBB + rotation des hitbox               *
  * - Contrôler un bateau                                *
  * - Commencer le jeu avec un score par bateau          *
+ *                                                      *
  *                                                      *
  ********************************************************/
 
@@ -89,6 +89,7 @@ void Affichage(){
     for (i = 0; i < NB_OBSTACLES; i++){
         afficher_obstacle(obstacles[i]);
     }
+
     
     /* afficher les transparent à la fin */
     affiche_eau();
@@ -143,10 +144,19 @@ void Animer() {
         // déplacement des poissons
         deplacer_poisson(&poissons[i]);
 
+        // Collisions poissons - poissons
+        for (j = i+1; j < NB_POISSONS; j++){
+            if (distance_carre_modele(poissons[i].o.modele, poissons[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_OBB(poissons[i].o.hitbox, poissons[j].o.hitbox)){
+                    printf("collision poisson %d et poisson %d\n", i, j);
+                }
+            }
+        }
+        
         // Collisions poissons - obstacles
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(poissons[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
-                if (collisions_AABB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
+                if (collisions_OBB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
                     printf("collision poisson %d et obstacle %d\n", i, j);
                     inverser_direction_poisson(&poissons[i]);
                 }
@@ -156,23 +166,40 @@ void Animer() {
         // Collisions poissons - canne à pêche bateaux
         for (j = 0; j < NB_BATEAUX; j++){
             if (distance_carre_modele(poissons[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
-                if (collisions_AABB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
+                if (collisions_OBB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
                     printf("poisson %d pêché par bateau %d!\n", i, j);
+                    
                 }
             }
         }
     }
 
+    // Les bateaux
     for (i = 0; i < NB_BATEAUX; i++) {
+        // Évitement d'obstacles AVANT le déplacement
+        eviter_obstacles_bateau(&bateaux[i], obstacles, NB_OBSTACLES);
+        
         // déplacement des bateaux
         deplacer_bateau(&bateaux[i]);
-        tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
+        
+        // Rotation continue légère 
+         tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
 
+        // collisions bateaux - bateaux
+        for (j = i+1; j < NB_BATEAUX; j++){
+            if (distance_carre_modele(bateaux[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
+                if (collisions_OBB(bateaux[i].o.hitbox, bateaux[j].o.hitbox)){
+                    printf("collision bateau %d et bateau %d\n", i, j);
+                }
+            }
+        }
+        
         // collisions bateaux - obstacles
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(bateaux[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
-                if (collisions_AABB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
-                    printf("collisions bateaux %d et obstacle %d\n", i, j);
+                if (collisions_OBB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
+                    printf("collision bateau %d et obstacle %d - le bateau s'arrête!\n", i, j);
+                    changer_direction_bateau(&bateaux[i], M_PI); // Demi-tour
                 }
             }
         }
@@ -290,10 +317,7 @@ void GererClavier(unsigned char touche, int x, int y){
         }
         
         exit(EXIT_SUCCESS);
-    } else if (touche == 't'){
-        rotation_sur_place(&bateaux[0].o.modele, M_PI / 4, 'z');
-        translation(&bateaux[1].o.modele, 1, 0, 0);
-    }
+    }    
 }
 
 void GererSouris(int bouton, int etat, int x, int y) {
@@ -361,7 +385,7 @@ int main(int argc, char *argv[]){
     srand(time(NULL));
 
     /* génération */
-    generer_monde();
+    generer_monde();    
     
     glutMainLoop();
     return 0;

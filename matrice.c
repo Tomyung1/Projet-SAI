@@ -455,10 +455,6 @@ void trans_rot_z_alea_tout(matrice* modele, matrice* direction, matrice* hitbox,
     }
 
     // hitbox
-    set_mat(t, 0, 0, 1);   // pas de rotation
-    set_mat(t, 0, 1, 0);
-    set_mat(t, 1, 0, 0);
-    set_mat(t, 1, 1, 1);
     
     if (hitbox != NULL){
         res = mult_matrice(t, *hitbox);
