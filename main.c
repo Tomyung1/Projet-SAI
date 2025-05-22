@@ -99,12 +99,46 @@ void Affichage(){
 
 void Animer() {
     int i, j;
-    /*
     double dir_pois_x, dir_pois_y, dir_pois_z;
-    */
     
     // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
+
+        // Vérifier si un poisson est proche d'un bateau pour le mettre en fuite
+        for (j = 0; j < NB_BATEAUX; j++) {
+            // Utiliser la fonction de distance au carré pour optimiser
+            if (distance_carre_modele(poissons[i].o.modele, bateaux[j].o.modele) < 64.0) { // distance de 8 unités
+                // Récupérer les positions
+                double poisson_x = get_mat(poissons[i].o.modele, 0, 0);
+                double poisson_y = get_mat(poissons[i].o.modele, 1, 0);
+                double poisson_z = get_mat(poissons[i].o.modele, 2, 0);
+                
+                double bateau_x = get_mat(bateaux[j].o.modele, 0, 0);
+                double bateau_y = get_mat(bateaux[j].o.modele, 1, 0);
+                double bateau_z = get_mat(bateaux[j].o.modele, 2, 0);
+                
+                // Mettre le poisson en état de fuite
+                mettre_en_fuite(&poissons[i]);
+                
+                // Calculer la direction de fuite (opposée au bateau)
+                dir_pois_x = poisson_x - bateau_x;
+                dir_pois_y = poisson_y - bateau_y;
+                dir_pois_z = poisson_z - bateau_z;
+                
+                // Normaliser le vecteur de direction
+                double longueur = sqrt(dir_pois_x * dir_pois_x +
+                                       dir_pois_y * dir_pois_y +
+                                       dir_pois_z * dir_pois_z);
+                
+                if (longueur > 0) {
+                    set_mat(poissons[i].direction, 0, 0, dir_pois_x / longueur);
+                    set_mat(poissons[i].direction, 1, 0, dir_pois_y / longueur);
+                    set_mat(poissons[i].direction, 2, 0, dir_pois_z / longueur);
+                }
+                
+                break; // Un seul bateau suffit pour déclencher la fuite
+            }
+        }
 
         // déplacement des poissons
         deplacer_poisson(&poissons[i]);
@@ -114,6 +148,7 @@ void Animer() {
             if (distance_carre_modele(poissons[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_AABB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
                     printf("collision poisson %d et obstacle %d\n", i, j);
+                    inverser_direction_poisson(&poissons[i]);
                 }
             }
         }
@@ -122,70 +157,13 @@ void Animer() {
         for (j = 0; j < NB_BATEAUX; j++){
             if (distance_carre_modele(poissons[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_AABB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
-                    printf("collisions poisson %d et obstacle %d\n", i, j);
+                    printf("poisson %d pêché par bateau %d!\n", i, j);
                 }
             }
         }
-        
-        /*
-        // Vérifier si un poisson est proche d'un bateau
-        // Si oui, le mettre en état de fuite
-        for (j = 0; j < NB_BATEAUX; j++) {
-            // Récupérer les positions
-            double poisson_x = get_mat(poissons[i].o.modele, 0, 0);
-            double poisson_y = get_mat(poissons[i].o.modele, 1, 0);
-            double poisson_z = get_mat(poissons[i].o.modele, 2, 0);
-            
-            double bateau_x = get_mat(bateaux[j].o.modele, 0, 0);
-            double bateau_y = get_mat(bateaux[j].o.modele, 1, 0);
-            double bateau_z = get_mat(bateaux[j].o.modele, 2, 0);
-            
-            // Calculer la distance
-            double distance = pow(poisson_x - bateau_x, 2) + 
-                              pow(poisson_y - bateau_y, 2) + 
-                              pow(poisson_z - bateau_z, 2);
-            
-            // Si un bateau est proche, le poisson fuit
-            if (distance < 8.0 * 8.0) {
-                mettre_en_fuite(&poissons[i]);
-                
-                // Direction opposée au bateau
-                set_mat(poissons[i].direction, 0, 0, poisson_x - bateau_x);
-                set_mat(poissons[i].direction, 1, 0, poisson_y - bateau_y);
-                set_mat(poissons[i].direction, 2, 0, poisson_z - bateau_z);
-                
-                dir_pois_x = get_mat(poissons[i].direction, 0, 0);
-                dir_pois_y = get_mat(poissons[i].direction, 1, 0);
-                dir_pois_z = get_mat(poissons[i].direction, 2, 0);
-                
-                // Normaliser
-                double longueur = sqrt(dir_pois_x * dir_pois_x +
-                                       dir_pois_y * dir_pois_y +
-                                       dir_pois_z * dir_pois_z);
-                
-                if (longueur > 0) {
-                    set_mat(poissons[i].direction, 0, 0, dir_pois_x / longueur);
-                    set_mat(poissons[i].direction, 1, 0, dir_pois_y / longueur);
-                    set_mat(poissons[i].direction, 2, 0, dir_pois_z / longueur);
-
-                    // mise à jour des variables de direction
-                    dir_pois_x = get_mat(poissons[i].direction, 0, 0);
-                    dir_pois_y = get_mat(poissons[i].direction, 1, 0);
-                    dir_pois_z = get_mat(poissons[i].direction, 2, 0);
-                }
-                
-                // Rotation pour faire face à la nouvelle direction
-                double angle = atan2(dir_pois_y, dir_pois_x);
-                rotation_z(&poissons[i].o.modele, angle - M_PI/2); 
-                
-                break; // Un seul bateau suffit pour fuir
-            }
-        }
-        */
     }
 
     for (i = 0; i < NB_BATEAUX; i++) {
-
         // déplacement des bateaux
         deplacer_bateau(&bateaux[i]);
         tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
@@ -202,7 +180,6 @@ void Animer() {
     
     glutPostRedisplay();
 }
-
 void GererMouvementSouris(int x, int y) {
     // Si c'est le premier appel ou le curseur a été recentré, ignorer
     if (souris_x_prec == -1 || souris_y_prec == -1 || 

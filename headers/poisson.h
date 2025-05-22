@@ -24,5 +24,7 @@ void tourner_poisson(poisson *p, double theta, char sens);
 // void changer_direction_poisson(poisson *p);
 void mettre_en_fuite(poisson *p);
 void mettre_en_normal(poisson *p);
+void changer_direction_poisson(poisson *p);
+void inverser_direction_poisson(poisson *p);
 
 #endif /* _POISSON_H_ */

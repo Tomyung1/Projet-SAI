@@ -44,41 +44,36 @@ void deplacer_poisson(poisson *p) {
     translation(&(p -> o.modele), dx, dy, dz);
     translation(&(p -> o.hitbox), dx, dy, dz);
 
-    /* ... voir les limites dans headers/config.h
-
-    // Si le poisson atteint une limite, on change sa direction
-    if (x_pos > limite_x || x_pos < -limite_x) {
-        p->direction_x = -p->direction_x;
-        // Rotation pour faire face à la nouvelle direction
-        double angle = atan2(p->direction_y, p->direction_x);
-        rotation_z(&p->o.modele, angle - M_PI/2); // Ajuster selon votre modèle
-    }
-    
-    if (y_pos > limite_y || y_pos < -limite_y) {
-        p->direction_y = -p->direction_y;
-        // Rotation pour faire face à la nouvelle direction
-        double angle = atan2(p->direction_y, p->direction_x);
-        rotation_z(&p->o.modele, angle - M_PI/2); // Ajuster selon votre modèle
-    }
-    
-    if (z_pos > limite_z_sup || z_pos < limite_z_inf) {
-        p->direction_z = -p->direction_z;
-    }
-    
     // Gestion du temps dans l'état actuel
     p->temps_etat++;
     
-    // Changement aléatoire de direction tous les ~100 déplacements en état normal
-    if (p->etat_poisson == ETAT_NORMAL && (rand() % 200 == 0)) {
-    changer_direction_poisson(p);
-}
+    // Changement aléatoire de direction tous les ~200 déplacements en état normal
+    if (p->etat_poisson == ETAT_NORMAL && (rand() % 500 == 0)) {
+        changer_direction_poisson(p);
+    }
     
-    // Retour à l'état normal après environ 5 secondes de fuite
-    if (p->etat_poisson == ETAT_FUITE && p->temps_etat > 300) { // ~5 secondes à 60 FPS
+    // Retour à l'état normal après environ 3 secondes de fuite
+    if (p->etat_poisson == ETAT_FUITE && p->temps_etat > 180) { // ~3 secondes à 60 FPS
         mettre_en_normal(p);
+        changer_direction_poisson(p); // Changer de direction après la fuite
     }
 
-    */
+    // Gestion des limites du monde - rebond sur les bords
+    double pos_x = get_mat(p->o.modele, 0, 0);
+    double pos_y = get_mat(p->o.modele, 1, 0);
+    double pos_z = get_mat(p->o.modele, 2, 0);
+    
+    if (pos_x > LIMITE_MAX_X - 5 || pos_x < LIMITE_MIN_X + 5) {
+        set_mat(p->direction, 0, 0, -get_mat(p->direction, 0, 0));
+    }
+    
+    if (pos_y > LIMITE_MAX_Y - 5 || pos_y < LIMITE_MIN_Y + 5) {
+        set_mat(p->direction, 1, 0, -get_mat(p->direction, 1, 0));
+    }
+    
+    if (pos_z > NIVEAU_MER - 1 || pos_z < NIVEAU_MER - 10) {
+        set_mat(p->direction, 2, 0, -get_mat(p->direction, 2, 0));
+    }
 }
 
 
@@ -124,4 +119,21 @@ void mettre_en_normal(poisson *p) {
     p->etat_poisson = ETAT_NORMAL;
     p->vitesse = p->vitesse_normale;
     p->temps_etat = 0;
+}
+// Change aléatoirement la direction du poisson
+void changer_direction_poisson(poisson *p) {
+    double theta_y = (rand() / (double)RAND_MAX) * 2 * M_PI; // Rotation horizontale
+    double theta_x = (rand() / (double)RAND_MAX - 0.5) * M_PI/3; // Rotation verticale limitée
+    
+    // Nouvelle direction normalisée
+    set_mat(p->direction, 0, 0, cos(theta_y) * cos(theta_x));
+    set_mat(p->direction, 1, 0, sin(theta_y) * cos(theta_x));
+    set_mat(p->direction, 2, 0, sin(theta_x));
+}
+
+// Inverse la direction du poisson (pour les collisions)
+void inverser_direction_poisson(poisson *p) {
+    set_mat(p->direction, 0, 0, -get_mat(p->direction, 0, 0));
+    set_mat(p->direction, 1, 0, -get_mat(p->direction, 1, 0));
+    set_mat(p->direction, 2, 0, -get_mat(p->direction, 2, 0));
 }

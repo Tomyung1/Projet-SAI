@@ -31,7 +31,8 @@
 /* debug */
 #define AFF_HITBOX 1 // si != 0, on affiche les hitbox
 #define AFF_DIR 1    // si != 0, on affiche les directions
-
+/* distance de détection pour la fuite des poissons */
+#define DISTANCE_FUITE_CARRE 64.0  // distance au carré de 8 unités
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */
