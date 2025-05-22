@@ -182,10 +182,10 @@ void afficher_hitbox_pave(matrice hitbox, couleur c){
 
     glColor3f(c.r, c.g, c.b);
     
-    x0 = get_mat(hitbox, 0, 0);
-    y0 = get_mat(hitbox, 1, 0);
-    z0 = get_mat(hitbox, 2, 0);
-    for (i = 1; i <= 3; i++){
+    x0 = get_mat(hitbox, 0, 1);
+    y0 = get_mat(hitbox, 1, 1);
+    z0 = get_mat(hitbox, 2, 1);
+    for (i = 2; i <= 4; i++){
         xi = get_mat(hitbox, 0, i);
         yi = get_mat(hitbox, 1, i);
         zi = get_mat(hitbox, 2, i);
@@ -193,10 +193,10 @@ void afficher_hitbox_pave(matrice hitbox, couleur c){
         glVertex3f(x0, y0, z0); glVertex3f(xi, yi, zi);
     }
     
-    x0 = get_mat(hitbox, 0, 7);
-    y0 = get_mat(hitbox, 1, 7);
-    z0 = get_mat(hitbox, 2, 7);
-    for (i = 4; i <= 6; i++){
+    x0 = get_mat(hitbox, 0, 8);
+    y0 = get_mat(hitbox, 1, 8);
+    z0 = get_mat(hitbox, 2, 8);
+    for (i = 5; i <= 7; i++){
         xi = get_mat(hitbox, 0, i);
         yi = get_mat(hitbox, 1, i);
         zi = get_mat(hitbox, 2, i);
@@ -204,26 +204,26 @@ void afficher_hitbox_pave(matrice hitbox, couleur c){
         glVertex3f(x0, y0, z0); glVertex3f(xi, yi, zi);
     }
 
-    xi = get_mat(hitbox, 0, 1);
-    yi = get_mat(hitbox, 1, 1);
-    zi = get_mat(hitbox, 2, 1);
-
-    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 5), get_mat(hitbox, 1, 5), get_mat(hitbox, 2, 5));
-    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 6), get_mat(hitbox, 1, 6), get_mat(hitbox, 2, 6));
-    
     xi = get_mat(hitbox, 0, 2);
     yi = get_mat(hitbox, 1, 2);
     zi = get_mat(hitbox, 2, 2);
-    
-    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 4), get_mat(hitbox, 1, 4), get_mat(hitbox, 2, 4));
+
     glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 6), get_mat(hitbox, 1, 6), get_mat(hitbox, 2, 6));
-                                        
+    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 7), get_mat(hitbox, 1, 7), get_mat(hitbox, 2, 7));
+    
     xi = get_mat(hitbox, 0, 3);
     yi = get_mat(hitbox, 1, 3);
     zi = get_mat(hitbox, 2, 3);
     
-    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 4), get_mat(hitbox, 1, 4), get_mat(hitbox, 2, 4));
     glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 5), get_mat(hitbox, 1, 5), get_mat(hitbox, 2, 5));
+    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 7), get_mat(hitbox, 1, 7), get_mat(hitbox, 2, 7));
+                                        
+    xi = get_mat(hitbox, 0, 4);
+    yi = get_mat(hitbox, 1, 4);
+    zi = get_mat(hitbox, 2, 4);
+    
+    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 5), get_mat(hitbox, 1, 5), get_mat(hitbox, 2, 5));
+    glVertex3f(xi, yi, zi); glVertex3f(get_mat(hitbox, 0, 6), get_mat(hitbox, 1, 6), get_mat(hitbox, 2, 6));
     
     
     glEnd();

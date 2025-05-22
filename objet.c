@@ -79,10 +79,17 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
         fclose(f);
         exit(EXIT_FAILURE);        
     }
+
+    printf("avant\n");
     
-    *hitbox = creer_matrice(4, n);
+    *hitbox = creer_matrice(4, n+1);
     
-    for (i = 0; i < n; i++){
+    set_mat(*hitbox, 0, 0, 0);
+    set_mat(*hitbox, 1, 0, 0);
+    set_mat(*hitbox, 2, 0, 0);
+    set_mat(*hitbox, 3, 0, 1);
+        
+    for (i = 1; i <= n; i++){
         if (fscanf(f, "%lf,%lf,%lf\n", &x, &y, &z) != 3){
             fprintf(stderr, "Erreur lecture modèle 3D\n");
             fclose(f);
@@ -98,10 +105,18 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
 
     /* lecture d'une deuxième hitbox si elle existe*/
 
-    if (fscanf(f, "%d\n", &n) == 1){ // nombre de points pour la deuxième hitbox (2 pour un pavé)
-        *hitbox2 = creer_matrice(4, n);
+    printf("après1\n");
 
-        for (i = 0; i < n; i++) {
+
+    if (fscanf(f, "%d\n", &n) == 1){ // nombre de points pour la deuxième hitbox (2 pour un pavé)
+        *hitbox2 = creer_matrice(4, n+1);
+
+        set_mat(*hitbox2, 0, 0, 0);
+        set_mat(*hitbox2, 1, 0, 0);
+        set_mat(*hitbox2, 2, 0, 0);
+        set_mat(*hitbox2, 3, 0, 1);
+        
+        for (i = 1; i <= n; i++) {
             if (fscanf(f, "%lf,%lf,%lf\n", &x, &y, &z) != 3){
                 fprintf(stderr, "Erreur lecture modèle 3D\n");
                 fclose(f);
@@ -116,6 +131,10 @@ void lire_modele(char * chemin, matrice *modele, matrice *hitbox, matrice *hitbo
             set_mat(*hitbox2, 3, i, 1);
         }
     }
+
+    
+    printf("après2\n");
+
     
     fclose(f);
 }

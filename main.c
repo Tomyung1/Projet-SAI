@@ -104,9 +104,6 @@ void Animer() {
     double dir_pois_x, dir_pois_y, dir_pois_z;
     */  
     
-
-
-
     // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
 

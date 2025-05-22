@@ -58,4 +58,6 @@ void tourner_bateau(bateau *b, double theta, char sens){
 
     rotation_sur_place(&(b -> o.modele), t, 'z');
     rotation_sur_place(&(b -> direction), t, 'z');
+    rotation_sur_place(&(b -> o.hitbox), t, 'z');
+    rotation_sur_place(&(b -> hitbox_canne), t, 'z');
 }
