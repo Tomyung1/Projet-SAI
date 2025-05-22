@@ -38,6 +38,21 @@
 #define AFF_DIR 1    // si != 0, on affiche les directions
 /* distance de détection pour la fuite des poissons */
 #define DISTANCE_FUITE_CARRE 64.0  // distance au carré de 8 unités
+/* Mode de jeu */
+#define MODE_LIBRE 0
+#define MODE_JEU 1
+
+/* Contrôles du jeu */
+#define NB_TOUCHES 256  // Nombre de touches du clavier
+#define TOUCHE_FLECHE_HAUT 101
+#define TOUCHE_FLECHE_BAS 103
+#define TOUCHE_FLECHE_GAUCHE 100
+#define TOUCHE_FLECHE_DROITE 102
+#define TOUCHE_ESPACE 32
+
+/* Gameplay */
+#define VITESSE_BATEAU_JOUEUR 0.01
+#define VITESSE_ROTATION_BATEAU 0.05
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */

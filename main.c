@@ -45,12 +45,29 @@ float angle_y = 0.0;     /* Angle de rotation autour de l'axe Y */
 float angle_z = 0.0;     /* Angle de rotation autour de l'axe Z */
 int bouton_presse = 0;   /* État des boutons de la souris */
 
-
+/* Variables de jeu */
+int mode_jeu = MODE_LIBRE;  /* Mode actuel : libre ou jeu */
+int touches_pressees[NB_TOUCHES] = {0};  /* Tableau de bits pour les touches */
+int bateau_joueur = 0;  /* Index du bateau contrôlé par le joueur */
+int score_poissons = 0;  /* Score du joueur */
+int jeu_actif = 0;  /* Le jeu est-il démarré */
 
 /* x : largeur, y : profondeur, z : hauteur */
 
 
-
+// Déclarations de fonctions
+void Affichage();
+void Animer();
+void GererClavier(unsigned char touche, int x, int y);
+void GererMouvementSouris(int x, int y);
+void controler_bateau_joueur();
+void pecher_poisson(int index_poisson);
+void basculer_mode();
+void GererToucheNormale(unsigned char touche, int x, int y);
+void GererToucheSpeciale(int touche, int x, int y);
+void GererToucheSpecialeRelachee(int touche, int x, int y);
+void GererToucheNormaleRelachee(unsigned char touche, int x, int y);
+void afficher_score_console();
 
 void Affichage(){
     int i;
@@ -83,7 +100,7 @@ void Affichage(){
     }
     
     for (i = 0; i < NB_BATEAUX; i++){
-        afficher_bateau(bateaux[i]);
+        afficher_bateau(bateaux[i], (mode_jeu == MODE_JEU && i == bateau_joueur));
     }
 
     for (i = 0; i < NB_OBSTACLES; i++){
@@ -101,7 +118,14 @@ void Affichage(){
 void Animer() {
     int i, j;
     double dir_pois_x, dir_pois_y, dir_pois_z;
+    static int compteur_affichage = 0;
     
+    // Contrôler le bateau du joueur
+    controler_bateau_joueur();
+    if (mode_jeu == MODE_JEU && compteur_affichage % 30 == 0) {
+        afficher_score_console();
+    }
+    compteur_affichage++;
     // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
 
@@ -167,8 +191,12 @@ void Animer() {
         for (j = 0; j < NB_BATEAUX; j++){
             if (distance_carre_modele(poissons[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(poissons[i].o.hitbox, bateaux[j].hitbox_canne)){
-                    printf("poisson %d pêché par bateau %d!\n", i, j);
-                    
+                    if (mode_jeu == MODE_JEU && j == bateau_joueur) {
+                        // Le joueur pêche un poisson !
+                        pecher_poisson(i);
+                    } else {
+                        printf("poisson %d pêché par bateau %d!\n", i, j);
+                    }
                 }
             }
         }
@@ -176,14 +204,13 @@ void Animer() {
 
     // Les bateaux
     for (i = 0; i < NB_BATEAUX; i++) {
-        // Évitement d'obstacles AVANT le déplacement
-        eviter_obstacles_bateau(&bateaux[i], obstacles, NB_OBSTACLES);
-        
-        // déplacement des bateaux
-        deplacer_bateau(&bateaux[i]);
-        
-        // Rotation continue légère 
-         tourner_bateau(&bateaux[i], M_PI / 4096, 'd');
+        if (mode_jeu == MODE_LIBRE || i != bateau_joueur) {
+            // Évitement d'obstacles AVANT le déplacement
+            eviter_obstacles_bateau(&bateaux[i], obstacles, NB_OBSTACLES);
+            
+            // déplacement des bateaux
+            deplacer_bateau(&bateaux[i]);
+        }
 
         // collisions bateaux - bateaux
         for (j = i+1; j < NB_BATEAUX; j++){
@@ -207,40 +234,6 @@ void Animer() {
     
     glutPostRedisplay();
 }
-void GererMouvementSouris(int x, int y) {
-    // Si c'est le premier appel ou le curseur a été recentré, ignorer
-    if (souris_x_prec == -1 || souris_y_prec == -1 || 
-        (x == LARGUEUR/2 && y == HAUTEUR/2)) {
-        souris_x_prec = x;
-        souris_y_prec = y;
-        return;
-    }
-    
-    // Calculer les déplacements relatifs
-    int dx = souris_x_prec - x;
-    int dy = souris_y_prec - y;
-    
-    // Sensibilité de la souris
-    float sensibilite = 0.002;
-    
-    // Mise à jour des angles de rotation
-    angle_y += dx * sensibilite;
-    angle_z += dy * sensibilite;
-    
-    // Limiter l'angle vertical pour éviter de se retourner complètement
-    if (angle_z > M_PI/2 - 0.1)
-        angle_z = M_PI/2 - 0.1;
-    if (angle_z < -M_PI/2 + 0.1)
-        angle_z = -M_PI/2 + 0.1;
-    
-    // Recentrer le curseur
-    glutWarpPointer(LARGUEUR/2, HAUTEUR/2);
-    
-    // Mémoriser la position centrée comme précédente
-    souris_x_prec = LARGUEUR/2;
-    souris_y_prec = HAUTEUR/2;
-}
-
 void GererClavier(unsigned char touche, int x, int y){
     int i;
     float vitesse_deplacement = 1.0;
@@ -298,13 +291,35 @@ void GererClavier(unsigned char touche, int x, int y){
         souris_active = !souris_active;
         if (souris_active) {
             glutSetCursor(GLUT_CURSOR_NONE);
-            glutPassiveMotionFunc(GererMouvementSouris);
-            glutMotionFunc(GererMouvementSouris);
+            // glutPassiveMotionFunc(GererMouvementSouris);
+            // glutMotionFunc(GererMouvementSouris);
         } else {
             glutSetCursor(GLUT_CURSOR_INHERIT);
             glutPassiveMotionFunc(NULL);
             glutMotionFunc(NULL);
         }
+    } else if (touche == 'j' || touche == 'J'){  /* basculer mode jeu */
+        basculer_mode();
+    } else if (touche == 'i' || touche == 'I'){  /* informations */
+        printf("\n╔════════════════════════════════════╗\n");
+        printf("║            INFORMATIONS            ║\n");
+        printf("╠════════════════════════════════════╣\n");
+        printf("║ Mode actuel : %-20s ║\n", (mode_jeu == MODE_JEU) ? "JEU" : "LIBRE");
+        if (mode_jeu == MODE_JEU) {
+            printf("║ Score : %-26d ║\n", score_poissons);
+            printf("║ Bateau : VERT (contrôlable)       ║\n");
+        }
+        printf("╠════════════════════════════════════╣\n");
+        printf("║ Contrôles :                        ║\n");
+        printf("║ • J : Basculer mode jeu/libre      ║\n");
+        if (mode_jeu == MODE_JEU) {
+            printf("║ • Flèches : Contrôler le bateau   ║\n");
+        }
+        printf("║ • C : Changer de vue               ║\n");
+        printf("║ • ZQSD : Se déplacer (observateur) ║\n");
+        printf("║ • I : Afficher ces informations    ║\n");
+        printf("║ • M : Toggle contrôle souris       ║\n");
+        printf("╚════════════════════════════════════╝\n");
     } else if (touche == 27){  /* quitter avec echap */
         for (i = 0; i < NB_POISSONS; i++){
             liberer_poisson(poissons[i]);
@@ -317,9 +332,47 @@ void GererClavier(unsigned char touche, int x, int y){
         }
         
         exit(EXIT_SUCCESS);
-    }    
+    } else if (touche == 't'){
+        rotation_sur_place(&bateaux[0].o.modele, M_PI / 4, 'z');
+        translation(&bateaux[1].o.modele, 1, 0, 0);
+    }
+    
+    // Gérer les touches normales pour le tableau de bits
+    GererToucheNormale(touche, x, y);
 }
-
+void GererMouvementSouris(int x, int y) {
+    // Si c'est le premier appel ou le curseur a été recentré, ignorer
+    if (souris_x_prec == -1 || souris_y_prec == -1 || 
+        (x == LARGUEUR/2 && y == HAUTEUR/2)) {
+        souris_x_prec = x;
+        souris_y_prec = y;
+        return;
+    }
+    
+    // Calculer les déplacements relatifs
+    int dx = souris_x_prec - x;
+    int dy = souris_y_prec - y;
+    
+    // Sensibilité de la souris
+    float sensibilite = 0.002;
+    
+    // Mise à jour des angles de rotation
+    angle_y += dx * sensibilite;
+    angle_z += dy * sensibilite;
+    
+    // Limiter l'angle vertical pour éviter de se retourner complètement
+    if (angle_z > M_PI/2 - 0.1)
+        angle_z = M_PI/2 - 0.1;
+    if (angle_z < -M_PI/2 + 0.1)
+        angle_z = -M_PI/2 + 0.1;
+    
+    // Recentrer le curseur
+    glutWarpPointer(LARGUEUR/2, HAUTEUR/2);
+    
+    // Mémoriser la position centrée comme précédente
+    souris_x_prec = LARGUEUR/2;
+    souris_y_prec = HAUTEUR/2;
+}
 void GererSouris(int bouton, int etat, int x, int y) {
     /* Sauvegarde de la position actuelle de la souris */
     souris_x_prec = x;
@@ -344,6 +397,130 @@ void GererSouris(int bouton, int etat, int x, int y) {
         }
     }
 }
+/* Fonction appelée quand une touche est pressée */
+void GererToucheSpeciale(int touche, int x, int y) {
+    if (touche < NB_TOUCHES) {
+        touches_pressees[touche] = 1;
+    }
+}
+
+/* Fonction appelée quand une touche spéciale est relâchée */
+void GererToucheSpecialeRelachee(int touche, int x, int y) {
+    if (touche < NB_TOUCHES) {
+        touches_pressees[touche] = 0;
+    }
+}
+
+/* Fonction appelée quand une touche normale est pressée */
+void GererToucheNormale(unsigned char touche, int x, int y) {
+    if (touche < NB_TOUCHES) {
+        touches_pressees[touche] = 1;
+    }
+}
+
+/* Fonction appelée quand une touche normale est relâchée */
+void GererToucheNormaleRelachee(unsigned char touche, int x, int y) {
+    if (touche < NB_TOUCHES) {
+        touches_pressees[touche] = 0;
+    }
+}
+
+/* Contrôler le bateau du joueur */
+void controler_bateau_joueur() {
+    if (!jeu_actif || mode_jeu != MODE_JEU) return;
+    
+    bateau *b = &bateaux[bateau_joueur];
+    
+    /* Rotation */
+    if (touches_pressees[TOUCHE_FLECHE_GAUCHE]) {
+        tourner_bateau(b, VITESSE_ROTATION_BATEAU, 'g');
+    }
+    if (touches_pressees[TOUCHE_FLECHE_DROITE]) {
+        tourner_bateau(b, VITESSE_ROTATION_BATEAU, 'd');
+    }
+    
+    /* Mouvement avant/arrière */
+    if (touches_pressees[TOUCHE_FLECHE_HAUT]) {
+        // Avancer dans la direction actuelle
+        double dx = get_mat(b->direction, 0, 0) * VITESSE_BATEAU_JOUEUR;
+        double dy = get_mat(b->direction, 1, 0) * VITESSE_BATEAU_JOUEUR;
+        double dz = get_mat(b->direction, 2, 0) * VITESSE_BATEAU_JOUEUR;
+        
+        translation(&(b->o.modele), dx, dy, dz);
+        translation(&(b->o.hitbox), dx, dy, dz);
+        translation(&(b->hitbox_canne), dx, dy, dz);
+    }
+    if (touches_pressees[TOUCHE_FLECHE_BAS]) {
+        // Reculer
+        double dx = get_mat(b->direction, 0, 0) * (-VITESSE_BATEAU_JOUEUR);
+        double dy = get_mat(b->direction, 1, 0) * (-VITESSE_BATEAU_JOUEUR);
+        double dz = get_mat(b->direction, 2, 0) * (-VITESSE_BATEAU_JOUEUR);
+        
+        translation(&(b->o.modele), dx, dy, dz);
+        translation(&(b->o.hitbox), dx, dy, dz);
+        translation(&(b->hitbox_canne), dx, dy, dz);
+    }
+}
+
+/* Fonction de pêche */
+void pecher_poisson(int index_poisson) {
+    if (index_poisson < 0 || index_poisson >= NB_POISSONS) return;
+    
+    score_poissons++;
+    printf("\n*** POISSON PECHE ! Score : %d ***\n", score_poissons);
+    
+    // Repositionner le poisson ailleurs 
+    double nouveau_x = (rand() % 80) - 40;  // Position aléatoire entre -40 et 40
+    double nouveau_y = (rand() % 80) - 40;
+    double nouveau_z = NIVEAU_MER - (rand() % 5) - 1;  
+    
+    // Calculer le déplacement nécessaire
+    double pos_actuelle_x = get_mat(poissons[index_poisson].o.modele, 0, 0);
+    double pos_actuelle_y = get_mat(poissons[index_poisson].o.modele, 1, 0);
+    double pos_actuelle_z = get_mat(poissons[index_poisson].o.modele, 2, 0);
+    
+    double dx = nouveau_x - pos_actuelle_x;
+    double dy = nouveau_y - pos_actuelle_y;
+    double dz = nouveau_z - pos_actuelle_z;
+    
+    // Déplacer le poisson et sa hitbox
+    translation(&poissons[index_poisson].o.modele, dx, dy, dz);
+    translation(&poissons[index_poisson].o.hitbox, dx, dy, dz);
+    
+    // Remettre le poisson en état normal
+    mettre_en_normal(&poissons[index_poisson]);
+}
+void afficher_score_console() {
+    if (mode_jeu == MODE_JEU) {
+        printf("\r[PECHE] Score: %d poissons peches", score_poissons);
+        fflush(stdout);  
+    }
+}
+/* Basculer entre mode libre et mode jeu */
+void basculer_mode() {
+    mode_jeu = (mode_jeu == MODE_LIBRE) ? MODE_JEU : MODE_LIBRE;
+    
+    if (mode_jeu == MODE_JEU) {
+        jeu_actif = 1;
+        score_poissons = 0;
+        printf("\n╔══════════════════════════════════╗\n");
+        printf("║        MODE JEU ACTIVÉ           ║\n");
+        printf("╠══════════════════════════════════╣\n");
+        printf("║ Votre bateau: VERT               ║\n");
+        printf("║ Contrôles:                       ║\n");
+        printf("║ • Flèches: Se déplacer           ║\n");
+        printf("║ • Objectif: Pêcher des poissons! ║\n");
+        printf("╚══════════════════════════════════╝\n");
+        
+        // Positionner la caméra sur le bateau du joueur
+        p_x = get_mat(bateaux[bateau_joueur].o.modele, 0, 0);
+        p_y = get_mat(bateaux[bateau_joueur].o.modele, 1, 0) - 20;
+        p_z = get_mat(bateaux[bateau_joueur].o.modele, 2, 0) + 10;
+    } else {
+        jeu_actif = 0;
+        printf("\n=== MODE LIBRE ACTIVÉ ===\n");
+    }
+}
 
 int main(int argc, char *argv[]){
     
@@ -363,6 +540,9 @@ int main(int argc, char *argv[]){
     glutDisplayFunc(Affichage);
     glutIdleFunc(Animer);
     glutKeyboardFunc(GererClavier);
+    glutKeyboardUpFunc(GererToucheNormaleRelachee);  
+    glutSpecialFunc(GererToucheSpeciale);            
+    glutSpecialUpFunc(GererToucheSpecialeRelachee);  
     glutMouseFunc(GererSouris);
     glutPassiveMotionFunc(GererMouvementSouris);
     glutMotionFunc(GererMouvementSouris); 
