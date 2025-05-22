@@ -481,10 +481,10 @@ void generer_monde(){
 
             test_collision = 0;
             for (j = 0; j < i && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(poissons[i].o.hitbox, poissons[j].o.hitbox);
+                test_collision = test_collision || collisions_OBB(poissons[i].o.hitbox, poissons[j].o.hitbox);
             }
             for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
+                test_collision = test_collision || collisions_OBB(copie_hitbox, obstacles[j].o.hitbox);
             }
             
             // cas d'arrêt
@@ -524,10 +524,10 @@ void generer_monde(){
 
             test_collision = 0;
             for (j = 0; j < i && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(copie_hitbox, bateaux[j].o.hitbox);
+                test_collision = test_collision || collisions_OBB(copie_hitbox, bateaux[j].o.hitbox);
             }
             for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
+                test_collision = test_collision || collisions_OBB(copie_hitbox, obstacles[j].o.hitbox);
             }
             
             // cas d'arrêt
