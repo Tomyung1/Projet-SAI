@@ -3,8 +3,6 @@
 
 #include "matrice.h"
 
-// AABB, Amélioration : OBB avec SAT
-
 int collisions_AABB(matrice hitbox1, matrice hitbox2);
 int collisions_OBB(matrice hitboxA, matrice hitboxB);
 

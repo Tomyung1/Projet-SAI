@@ -465,7 +465,6 @@ void generer_monde(){
         }
     }
     
-    
     // bateaux (ne rentre pas en collisions entre eux et avec les obstacles)
     for (i = 0; i < NB_BATEAUX; i++){
         
@@ -484,11 +483,11 @@ void generer_monde(){
             test_collision = 0;
             // collisions bateau - bateau
             for (j = 0; j < i && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(copie_hitbox, bateaux[j].o.hitbox);
+                test_collision = test_collision || collisions_OBB(copie_hitbox, bateaux[j].o.hitbox);
             }
             // collision bateau - obstacle
             for (j = 0; j < NB_OBSTACLES && !test_collision; j++){
-                test_collision = test_collision || collisions_AABB(copie_hitbox, obstacles[j].o.hitbox);
+                test_collision = test_collision || collisions_OBB(copie_hitbox, obstacles[j].o.hitbox);
             }
             
             // cas d'arrêt
