@@ -60,6 +60,7 @@ void Affichage();
 void Animer();
 void GererClavier(unsigned char touche, int x, int y);
 void GererMouvementSouris(int x, int y);
+void GererSouris(int bouton, int etat, int x, int y);
 void controler_bateau_joueur();
 void pecher_poisson(int index_poisson);
 void basculer_mode();
@@ -122,10 +123,13 @@ void Animer() {
     
     // Contrôler le bateau du joueur
     controler_bateau_joueur();
+    
+    // Afficher le score périodiquement
     if (mode_jeu == MODE_JEU && compteur_affichage % 30 == 0) {
         afficher_score_console();
     }
     compteur_affichage++;
+    
     // Les poissons
     for (i = 0; i < NB_POISSONS; i++) {
 
@@ -149,20 +153,20 @@ void Animer() {
                 dir_pois_x = poisson_x - bateau_x;
                 dir_pois_y = poisson_y - bateau_y;
                 dir_pois_z = poisson_z - bateau_z;
-                
+
                 // Normaliser le vecteur de direction
-                double longueur = sqrt(dir_pois_x * dir_pois_x +
-                                       dir_pois_y * dir_pois_y +
-                                       dir_pois_z * dir_pois_z);
-                
+                double longueur = sqrt(dir_pois_x * dir_pois_x + dir_pois_y * dir_pois_y + dir_pois_z * dir_pois_z);
+
                 if (longueur > 0) {
-                    // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
-                    set_mat(poissons[i].direction, 0, 0, dir_pois_x / longueur);
-                    set_mat(poissons[i].direction, 1, 0, dir_pois_y / longueur);
-                    set_mat(poissons[i].direction, 2, 0, dir_pois_z / longueur);
+                    // Calculer l'angle de rotation nécessaire
+                    double nouvel_angle = atan2(dir_pois_y, dir_pois_x);
+                    double ancien_angle = atan2(get_mat(poissons[i].direction, 1, 0), get_mat(poissons[i].direction, 0, 0));
+                    double rotation_necessaire = nouvel_angle - ancien_angle;
+    
+                    // Faire tourner le poisson pour qu'il "regarde" dans la bonne direction
+                    tourner_poisson(&poissons[i], rotation_necessaire, 'z'); // Rotation autour de Z
                 }
-                
-                break; // Un seul bateau suffit pour déclencher la fuite
+                break;
             }
         }
 
@@ -183,7 +187,7 @@ void Animer() {
             if (distance_carre_modele(poissons[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
                     printf("collision poisson %d et obstacle %d\n", i, j);
-                    inverser_direction_poisson(&poissons[i]);
+                    tourner_poisson(&poissons[i], M_PI, 'z'); // Demi-tour
                 }
             }
         }
@@ -227,7 +231,7 @@ void Animer() {
             if (distance_carre_modele(bateaux[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
                     printf("collision bateau %d et obstacle %d - le bateau s'arrête!\n", i, j);
-                    changer_direction_bateau(&bateaux[i], M_PI); // Demi-tour
+                    tourner_bateau(&bateaux[i], M_PI, 'z'); // Demi-tour
                 }
             }
         }
@@ -235,6 +239,7 @@ void Animer() {
     
     glutPostRedisplay();
 }
+
 void GererClavier(unsigned char touche, int x, int y){
     int i;
     float vitesse_deplacement = 1.0;
@@ -292,8 +297,8 @@ void GererClavier(unsigned char touche, int x, int y){
         souris_active = !souris_active;
         if (souris_active) {
             glutSetCursor(GLUT_CURSOR_NONE);
-            // glutPassiveMotionFunc(GererMouvementSouris);
-            // glutMotionFunc(GererMouvementSouris);
+            glutPassiveMotionFunc(GererMouvementSouris);
+            glutMotionFunc(GererMouvementSouris);
         } else {
             glutSetCursor(GLUT_CURSOR_INHERIT);
             glutPassiveMotionFunc(NULL);
@@ -341,6 +346,7 @@ void GererClavier(unsigned char touche, int x, int y){
     // Gérer les touches normales pour le tableau de bits
     GererToucheNormale(touche, x, y);
 }
+
 void GererMouvementSouris(int x, int y) {
     // Si c'est le premier appel ou le curseur a été recentré, ignorer
     if (souris_x_prec == -1 || souris_y_prec == -1 || 
@@ -374,6 +380,7 @@ void GererMouvementSouris(int x, int y) {
     souris_x_prec = LARGUEUR/2;
     souris_y_prec = HAUTEUR/2;
 }
+
 void GererSouris(int bouton, int etat, int x, int y) {
     /* Sauvegarde de la position actuelle de la souris */
     souris_x_prec = x;
@@ -398,7 +405,8 @@ void GererSouris(int bouton, int etat, int x, int y) {
         }
     }
 }
-/* Fonction appelée quand une touche est pressée */
+
+/* Fonction appelée quand une touche spéciale est pressée */
 void GererToucheSpeciale(int touche, int x, int y) {
     if (touche < NB_TOUCHES) {
         touches_pressees[touche] = 1;
@@ -473,7 +481,7 @@ void pecher_poisson(int index_poisson) {
     // Repositionner le poisson ailleurs 
     double nouveau_x = (rand() % 80) - 40;  // Position aléatoire entre -40 et 40
     double nouveau_y = (rand() % 80) - 40;
-    double nouveau_z = NIVEAU_MER - (rand() % 5) - 1;  
+    double nouveau_z = NIVEAU_MER - (rand() % 5) - 1;  // Sous l'eau
     
     // Calculer le déplacement nécessaire
     double pos_actuelle_x = get_mat(poissons[index_poisson].o.modele, 0, 0);
@@ -491,12 +499,14 @@ void pecher_poisson(int index_poisson) {
     // Remettre le poisson en état normal
     mettre_en_normal(&poissons[index_poisson]);
 }
+
 void afficher_score_console() {
     if (mode_jeu == MODE_JEU) {
         printf("\r[PECHE] Score: %d poissons peches", score_poissons);
         fflush(stdout);  
     }
 }
+
 /* Basculer entre mode libre et mode jeu */
 void basculer_mode() {
     mode_jeu = (mode_jeu == MODE_LIBRE) ? MODE_JEU : MODE_LIBRE;
