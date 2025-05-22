@@ -47,13 +47,13 @@ void deplacer_poisson(poisson *p) {
     // Gestion du temps dans l'état actuel
     p->temps_etat++;
     
-    // Changement aléatoire de direction tous les ~200 déplacements en état normal
+    // Changement aléatoire de direction
     if (p->etat_poisson == ETAT_NORMAL && (rand() % 500 == 0)) {
         changer_direction_poisson(p);
     }
     
     // Retour à l'état normal après environ 3 secondes de fuite
-    if (p->etat_poisson == ETAT_FUITE && p->temps_etat > 180) { // ~3 secondes à 60 FPS
+    if (p->etat_poisson == ETAT_FUITE && p->temps_etat > 180) { 
         mettre_en_normal(p);
         changer_direction_poisson(p); // Changer de direction après la fuite
     }
@@ -77,7 +77,6 @@ void deplacer_poisson(poisson *p) {
 }
 
 
-// /!\ combinaison de rotation étrange (alignement devrait résoudre)
 void tourner_poisson(poisson *p, double theta, char sens) {
     
     switch (sens){
@@ -109,8 +108,7 @@ void mettre_en_fuite(poisson *p) {
         p->vitesse = p->vitesse_fuite;
         p->temps_etat = 0;
         
-        // Optionnellement, changer de direction pour fuir
-        // ... fonction pas aléatoire
+
     }
 }
 

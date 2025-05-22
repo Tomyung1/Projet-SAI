@@ -27,6 +27,10 @@
 
 /* calcul */
 #define DIST_CALCUL_COLLISION_CARRE 400 // distance au carré entre 2 objet avant de calculer leur collision
+/* distance de détection d'obstacles pour les bateaux */
+#define DISTANCE_DETECTION_BATEAU 15.0
+#define ANGLE_CONE_DETECTION (M_PI/3)  // 60 degrés
+#define DUREE_EVITEMENT 120 
 
 /* debug */
 #define AFF_HITBOX 1 // si != 0, on affiche les hitbox
