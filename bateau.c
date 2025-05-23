@@ -188,7 +188,6 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
             
             // Normaliser
             double longueur = sqrt(nouveau_x * nouveau_x + nouveau_y * nouveau_y);
-            // ATTENTION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
             
             if (longueur > 0) {
                 set_mat(b->direction, 0, 0, nouveau_x / longueur);
