@@ -13,7 +13,7 @@ bateau creer_bateau(){
     b.o.etat = E_INITIAL;
 
     lire_modele("objets/bateau.obj", &b.o.modele, &b.o.hitbox, &b.hitbox_canne);
-
+    
     b.vitesse = 0.005;
     
     b.direction = creer_matrice(4, 1);

@@ -22,7 +22,7 @@
 #define NIVEAU_MER -5
 
 #define NB_POISSONS 120
-#define NB_BATEAUX 40
+#define NB_BATEAUX 20
 #define NB_OBSTACLES 16    // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
 
 #define NB_OBST_PAR_LIGNE 4   // modification = make clean
