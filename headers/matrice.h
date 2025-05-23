@@ -24,7 +24,6 @@ void translation(matrice* modele, double dx, double dy, double dz);
 void rotation_x(matrice* modele, double theta);
 void rotation_y(matrice* modele, double theta);
 void rotation_z(matrice* modele, double theta);
-void inversion_sens(matrice* modele);
 /* vvvvvvvvvv NE MARCHE PAS vvvvvvvvvv */
 void octant_negatif(matrice* modele, matrice* direction, matrice* hitbox, int* negatif_x, int* negatif_y, int* negatif_z);
 void octant_negatif_inverse(matrice* modele, matrice* direction, matrice* hitbox, int negatif_x, int negatif_y, int negatif_z);

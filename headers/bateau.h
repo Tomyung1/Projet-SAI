@@ -17,6 +17,7 @@ typedef struct {
 bateau creer_bateau();
 void liberer_bateau(bateau b);
 void deplacer_bateau(bateau *b);
+void petit_retour_arrière(bateau *b);
 void tourner_bateau(bateau *b, double theta, char sens);
 void eviter_obstacles_bateau(bateau *b, obstacle obstacles[], int nb_obstacles);
 void changer_direction_bateau(bateau *b, double angle);
