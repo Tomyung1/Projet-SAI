@@ -1,6 +1,8 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+/*  MODIFICATION ICI = make clean  */
+
 
 #define VISION_MAX 1000  /* distance maximal dont le personne peut voir */
 
@@ -20,7 +22,7 @@
 #define NIVEAU_MER -5
 
 #define NB_POISSONS 100
-#define NB_BATEAUX 20
+#define NB_BATEAUX 1
 #define NB_OBSTACLES 4    // /!\ NB_OBSTACLES = NB_OBST_PAR_LIGNE²
 
 #define NB_OBST_PAR_LIGNE 2   // modification = make clean
@@ -36,6 +38,8 @@
 /* debug */
 #define AFF_HITBOX 1 // si != 0, on affiche les hitbox
 #define AFF_DIR 1    // si != 0, on affiche les directions
+#define EVITEMENT 0  // si != 0, les bateaux évite les obstacles progressivement...
+
 /* distance de détection pour la fuite des poissons */
 #define DISTANCE_FUITE_CARRE 64.0  // distance au carré de 8 unités
 /* Mode de jeu */
@@ -52,7 +56,7 @@
 
 /* Gameplay */
 #define VITESSE_BATEAU_JOUEUR 0.01
-#define VITESSE_ROTATION_BATEAU 0.05
+#define VITESSE_ROTATION_BATEAU 0.003
 
 /* le faire avec opengl ? */
 /* couleur normalisée red/green/blue */

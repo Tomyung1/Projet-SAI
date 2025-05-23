@@ -13,6 +13,7 @@
 #include "headers/bateau.h"
 #include "headers/obstacle.h"
 
+#define JOUEUR bateaux[0]
 
 
 /* x : largeur, y : profondeur, z : hauteur */
@@ -22,16 +23,16 @@
 /********************************************************
  *                    Organisation                      *
  *                                                      *
- * - Collisions OBB + rotation des hitbox               *
- * - Contrôler un bateau                                *
- * - Commencer le jeu avec un score par bateau          *
+ *                                                      *
+ *                                                      *
+ * - collisions joueur (il est où ????????)             *
  *                                                      *
  *                                                      *
  ********************************************************/
 
 
 
-int p_x, p_y, p_z; /* position de l'observateur */
+double p_x, p_y, p_z; /* position de l'observateur */
 
 int test = 0; /* quel vu choisir : 0 = regarde en (0, 0, 0)
                                    1 = regarde devant */
@@ -49,8 +50,8 @@ int bouton_presse = 0;   /* État des boutons de la souris */
 int mode_jeu = MODE_LIBRE;  /* Mode actuel : libre ou jeu */
 int touches_pressees[NB_TOUCHES] = {0};  /* Tableau de bits pour les touches */
 int bateau_joueur = 0;  /* Index du bateau contrôlé par le joueur */
-int score_poissons = 0;  /* Score du joueur */
 int jeu_actif = 0;  /* Le jeu est-il démarré */
+double hauteur = 4; /* hauteur par rapport au centre du bateau pour la position de l'observateur */
 
 /* x : largeur, y : profondeur, z : hauteur */
 
@@ -79,6 +80,12 @@ void Affichage(){
     glLoadIdentity();
     glFrustum(-0.12, 0.12, -0.0675, 0.0675, 0.1, VISION_MAX);
 
+    if (mode_jeu == MODE_JEU){
+        p_x = get_mat(JOUEUR.o.modele, 0, 0);
+        p_y = get_mat(JOUEUR.o.modele, 1, 0);
+        p_z = get_mat(JOUEUR.o.modele, 2, 0) + hauteur;
+    }
+    
     if (test == 0){
         // Vue centrée
         gluLookAt(p_x, p_y, p_z, 0, 0, NIVEAU_MER, 0, 0, 1);
@@ -177,7 +184,7 @@ void Animer() {
         for (j = i+1; j < NB_POISSONS; j++){
             if (distance_carre_modele(poissons[i].o.modele, poissons[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(poissons[i].o.hitbox, poissons[j].o.hitbox)){
-                    printf("collision poisson %d et poisson %d\n", i, j);
+                    tourner_poisson(&poissons[i], M_PI, 'z');
                 }
             }
         }
@@ -186,7 +193,6 @@ void Animer() {
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(poissons[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(poissons[i].o.hitbox, obstacles[j].o.hitbox)){
-                    printf("collision poisson %d et obstacle %d\n", i, j);
                     tourner_poisson(&poissons[i], M_PI, 'z'); // Demi-tour
                 }
             }
@@ -199,8 +205,6 @@ void Animer() {
                     if (mode_jeu == MODE_JEU && j == bateau_joueur) {
                         // Le joueur pêche un poisson !
                         pecher_poisson(i);
-                    } else {
-                        printf("poisson %d pêché par bateau %d!\n", i, j);
                     }
                 }
             }
@@ -221,7 +225,7 @@ void Animer() {
         for (j = i+1; j < NB_BATEAUX; j++){
             if (distance_carre_modele(bateaux[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(bateaux[i].o.hitbox, bateaux[j].o.hitbox)){
-                    printf("collision bateau %d et bateau %d\n", i, j);
+                    tourner_bateau(&bateaux[i], M_PI, 'z'); // Demi-tour
                 }
             }
         }
@@ -230,7 +234,7 @@ void Animer() {
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(bateaux[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
-                    printf("collision bateau %d et obstacle %d - le bateau s'arrête!\n", i, j);
+                    
                     tourner_bateau(&bateaux[i], M_PI, 'z'); // Demi-tour
                 }
             }
@@ -249,40 +253,52 @@ void GererClavier(unsigned char touche, int x, int y){
     float frontal_y = sin(angle_y) * vitesse_deplacement;
     float lateral_x = cos(angle_y + M_PI/2) * vitesse_deplacement;
     float lateral_y = sin(angle_y + M_PI/2) * vitesse_deplacement;
+
+    if (mode_jeu == MODE_LIBRE){
+        if (touche == 'q'){  /* gauche */
+            if (test == 1) { // Mode première personne
+                p_x += lateral_x;
+                p_y += lateral_y;
+            }
+            else {
+                p_x -= 1;
+            }
+        
+        } else if (touche == 'd'){  /* droite */
+            if (test == 1) { // Mode première personne
+                p_x -= lateral_x;
+                p_y -= lateral_y;
+            }
+            else {
+                p_x += 1;
+            }
+        
+        } else if (touche == 'z'){  /* avancer */
+            if (test == 1) { // Mode première personne
+                p_x += frontal_x;
+                p_y += frontal_y;
+            }
+            else {
+                p_z += 1;
+            }
+        
+        } else if (touche == 's'){  /* reculer */
+            if (test == 1) { // Mode première personne
+                p_x -= frontal_x;
+                p_y -= frontal_y;
+            }
+            else {
+                p_z -= 1;
+            }
+        }
+    }
     
-    if (touche == 'q'){  /* gauche */
-        if (test == 1) { // Mode première personne
-            p_x += lateral_x;
-            p_y += lateral_y;
-        } else {
-            p_x -= 1;
-        }
-    } else if (touche == 'd'){  /* droite */
-        if (test == 1) { // Mode première personne
-            p_x -= lateral_x;
-            p_y -= lateral_y;
-        } else {
-            p_x += 1;
-        }
-    } else if (touche == 'z'){  /* avancer */
-        if (test == 1) { // Mode première personne
-            p_x += frontal_x;
-            p_y += frontal_y;
-        } else {
-            p_z += 1;
-        }
-    } else if (touche == 's'){  /* reculer */
-        if (test == 1) { // Mode première personne
-            p_x -= frontal_x;
-            p_y -= frontal_y;
-        } else {
-            p_z -= 1;
-        }
-    } else if (touche == 'r'){
+    /* else if (touche == 'r'){
         p_y += 1;
     } else if (touche == 'f'){
         p_y -= 1;
-    } else if (touche == 'c'){  /* changer de vue */
+    } */
+    if (touche == 'c'){  /* changer de vue */
         test = !test;
         if (test) {
             // Passer en mode première personne
@@ -312,7 +328,7 @@ void GererClavier(unsigned char touche, int x, int y){
         printf("╠════════════════════════════════════╣\n");
         printf("║ Mode actuel : %-20s ║\n", (mode_jeu == MODE_JEU) ? "JEU" : "LIBRE");
         if (mode_jeu == MODE_JEU) {
-            printf("║ Score : %-26d ║\n", score_poissons);
+            printf("║ Score : %-26d ║\n", JOUEUR.score_poissons);
             printf("║ Bateau : VERT (contrôlable)       ║\n");
         }
         printf("╠════════════════════════════════════╣\n");
@@ -338,9 +354,6 @@ void GererClavier(unsigned char touche, int x, int y){
         }
         
         exit(EXIT_SUCCESS);
-    } else if (touche == 't'){
-        rotation_sur_place(&bateaux[0].o.modele, M_PI / 4, 'z');
-        translation(&bateaux[1].o.modele, 1, 0, 0);
     }
     
     // Gérer les touches normales pour le tableau de bits
@@ -394,13 +407,21 @@ void GererSouris(int bouton, int etat, int x, int y) {
     }
     
     /* Zoom avec la molette de la souris */
-    if (etat == GLUT_DOWN) {
+    if (etat == GLUT_DOWN && mode_jeu == MODE_LIBRE) {
+        double lookX = cos(angle_y) * cos(angle_z);
+        double lookY = sin(angle_y) * cos(angle_z);
+        double lookZ = sin(angle_z);
+        
         switch (bouton) {
             case 3:  /* Molette vers le haut: zoom avant */
-                p_y += 2;
+                p_x += lookX;
+                p_y += lookY;
+                p_z += lookZ;
                 break;
             case 4:  /* Molette vers le bas: zoom arrière */
-                p_y -= 2;
+                p_x -= lookX;
+                p_y -= lookY;
+                p_z -= lookZ;
                 break;
         }
     }
@@ -475,8 +496,8 @@ void controler_bateau_joueur() {
 void pecher_poisson(int index_poisson) {
     if (index_poisson < 0 || index_poisson >= NB_POISSONS) return;
     
-    score_poissons++;
-    printf("\n*** POISSON PECHE ! Score : %d ***\n", score_poissons);
+    JOUEUR.score_poissons++;
+    printf("\n*** POISSON PECHE ! Score : %d ***\n", JOUEUR.score_poissons);
     
     // Repositionner le poisson ailleurs 
     double nouveau_x = (rand() % 80) - 40;  // Position aléatoire entre -40 et 40
@@ -502,7 +523,7 @@ void pecher_poisson(int index_poisson) {
 
 void afficher_score_console() {
     if (mode_jeu == MODE_JEU) {
-        printf("\r[PECHE] Score: %d poissons peches", score_poissons);
+        printf("\r[PECHE] Score: %d poissons peches", JOUEUR.score_poissons);
         fflush(stdout);  
     }
 }
@@ -513,7 +534,7 @@ void basculer_mode() {
     
     if (mode_jeu == MODE_JEU) {
         jeu_actif = 1;
-        score_poissons = 0;
+        JOUEUR.score_poissons = 0;
         printf("\n╔══════════════════════════════════╗\n");
         printf("║        MODE JEU ACTIVÉ           ║\n");
         printf("╠══════════════════════════════════╣\n");
@@ -525,8 +546,8 @@ void basculer_mode() {
         
         // Positionner la caméra sur le bateau du joueur
         p_x = get_mat(bateaux[bateau_joueur].o.modele, 0, 0);
-        p_y = get_mat(bateaux[bateau_joueur].o.modele, 1, 0) - 20;
-        p_z = get_mat(bateaux[bateau_joueur].o.modele, 2, 0) + 10;
+        p_y = get_mat(bateaux[bateau_joueur].o.modele, 1, 0);
+        p_z = get_mat(bateaux[bateau_joueur].o.modele, 2, 0) + hauteur;
     } else {
         jeu_actif = 0;
         printf("\n=== MODE LIBRE ACTIVÉ ===\n");
@@ -539,7 +560,7 @@ int main(int argc, char *argv[]){
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_SINGLE);
 
     glutInitWindowSize(LARGUEUR, HAUTEUR);
-    glutInitWindowPosition(50, 50);
+    glutInitWindowPosition(0, 0);
 
     glutCreateWindow("Projet SAI");
     glEnable(GL_DEPTH_TEST);

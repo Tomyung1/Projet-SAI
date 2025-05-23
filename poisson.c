@@ -47,7 +47,7 @@ void deplacer_poisson(poisson *p) {
     // Gestion du temps dans l'état actuel
     p->temps_etat++;
     
-    // Changement aléatoire de direction
+    // Changement de direction
     if (p->etat_poisson == ETAT_NORMAL && (rand() % 500 == 0)) {
         changer_direction_poisson(p);
     }
@@ -62,17 +62,16 @@ void deplacer_poisson(poisson *p) {
     double pos_x = get_mat(p->o.modele, 0, 0);
     double pos_y = get_mat(p->o.modele, 1, 0);
     double pos_z = get_mat(p->o.modele, 2, 0);
+    
+    double marge = 5;
 
-
-    // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER 
-    if (pos_x > LIMITE_MAX_X - 5 || pos_x < LIMITE_MIN_X + 5) {
+    if (pos_x > LIMITE_MAX_X - marge || pos_x < LIMITE_MIN_X + marge) {
         set_mat(p->direction, 0, 0, -get_mat(p->direction, 0, 0));
     }
     
-    if (pos_y > LIMITE_MAX_Y - 5 || pos_y < LIMITE_MIN_Y + 5) {
+    if (pos_y > LIMITE_MAX_Y - marge || pos_y < LIMITE_MIN_Y + marge) {
         set_mat(p->direction, 1, 0, -get_mat(p->direction, 1, 0));
     }
-    
     if (pos_z > NIVEAU_MER - 1 || pos_z < NIVEAU_MER - 10) {
         set_mat(p->direction, 2, 0, -get_mat(p->direction, 2, 0));
     }
@@ -113,8 +112,6 @@ void mettre_en_fuite(poisson *p) {
         p->etat_poisson = ETAT_FUITE;
         p->vitesse = p->vitesse_fuite;
         p->temps_etat = 0;
-        
-
     }
 }
 

@@ -11,6 +11,7 @@ typedef struct {
     double vitesse;
     matrice direction;
     matrice hitbox_canne;
+    int score_poissons; // nombre de poissons pêchés
 } bateau;
 
 bateau creer_bateau();

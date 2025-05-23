@@ -244,6 +244,22 @@ void rotation_z(matrice* modele, double theta){
     liberer_matrice(t);
 }
 
+void inversion_sens(matrice* modele){
+    matrice t = creer_identite(4);
+    matrice res;
+
+    set_mat(t, 0, 0, -1);
+    set_mat(t, 1, 1, -1);
+    set_mat(t, 2, 2, -1);
+    
+    res = mult_matrice(t, *modele);
+
+    liberer_matrice(*modele);
+
+    *modele = res;
+
+    liberer_matrice(t);
+}
 
 /* vvvvvvvvvv NE MARCHE PAS vvvvvvvvvv */
 

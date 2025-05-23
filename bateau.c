@@ -18,6 +18,8 @@ bateau creer_bateau(){
     
     b.direction = creer_matrice(4, 1);
     set_mat(b.direction, 0, 0, -1);
+
+    b.score_poissons = 0;
     
     return b;
 }
@@ -119,23 +121,30 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
     double bateau_x = get_mat(b->o.modele, 0, 0);
     double bateau_y = get_mat(b->o.modele, 1, 0);
     
-    double marge = 10.0;
+    double marge = 5.0;
     
     // Gestion des limites du monde 
     if (bateau_x > LIMITE_MAX_X - marge || bateau_x < LIMITE_MIN_X + marge ||
         bateau_y > LIMITE_MAX_Y - marge || bateau_y < LIMITE_MIN_Y + marge) {
-        
+
+        /*
         double vers_centre_x = -bateau_x;
         double vers_centre_y = -bateau_y;
         double longueur = sqrt(vers_centre_x * vers_centre_x + vers_centre_y * vers_centre_y);
         
+       
         if (longueur > 0) {
-            // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
-            set_mat(b->direction, 0, 0, vers_centre_x / longueur);
-            set_mat(b->direction, 1, 0, vers_centre_y / longueur);
-            temps_evitement[bateau_id] = 60;
-            phase_evitement[bateau_id] = 0; 
-        }
+        */
+        tourner_bateau(b, M_PI, 'd');
+            
+        /*
+          set_mat(b->direction, 0, 0, vers_centre_x / longueur);
+          set_mat(b->direction, 1, 0, vers_centre_y / longueur);
+        */
+
+        temps_evitement[bateau_id] = 60;
+        phase_evitement[bateau_id] = 0; 
+        
         
         bateau_id = (bateau_id + 1) % NB_BATEAUX;
         return;
@@ -146,21 +155,22 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
         temps_evitement[bateau_id]--;
         
         // Phase de contournement
-        if (phase_evitement[bateau_id] == 1) {
+        if (phase_evitement[bateau_id] == 1 && EVITEMENT) {
             // Continuer à tourner graduellement pendant le contournement
             double petit_angle = M_PI / 180.0; 
             double dir_actuelle_x = get_mat(b->direction, 0, 0);
             double dir_actuelle_y = get_mat(b->direction, 1, 0);
+
             
             // Rotation graduelle
             double nouveau_x = dir_actuelle_x * cos(petit_angle) - dir_actuelle_y * sin(petit_angle);
             double nouveau_y = dir_actuelle_x * sin(petit_angle) + dir_actuelle_y * cos(petit_angle);
             
-            // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
             set_mat(b->direction, 0, 0, nouveau_x);
             set_mat(b->direction, 1, 0, nouveau_y);
             
             // Passer à la phase de retour après la moitié du temps
+            
             if (temps_evitement[bateau_id] <= 45) {
                 phase_evitement[bateau_id] = 2;
             }
@@ -177,7 +187,8 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
             
             // Normaliser
             double longueur = sqrt(nouveau_x * nouveau_x + nouveau_y * nouveau_y);
-            // ATTETION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
+            // ATTENTION, UTILISER UNE FONCTION POUR TOUT FAIRE TOURNER
+            
             if (longueur > 0) {
                 set_mat(b->direction, 0, 0, nouveau_x / longueur);
                 set_mat(b->direction, 1, 0, nouveau_y / longueur);
@@ -197,7 +208,6 @@ void eviter_obstacles_bateau(bateau *b, obstacle *obstacles, int nb_obstacles) {
     int obstacle_index = detecter_obstacle_devant(b, obstacles, nb_obstacles);
     
     if (obstacle_index != -1) {
-        printf("Bateau %d commence l'évitement de l'iceberg %d!\n", bateau_id, obstacle_index);
         
         // Sauvegarder la direction originale
         direction_originale_x[bateau_id] = get_mat(b->direction, 0, 0);

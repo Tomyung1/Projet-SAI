@@ -280,18 +280,26 @@ void affiche_ciel(){
                  ciel1, ciel2, ciel3);
 }
 
+
 /* règle de dessin */
 void afficher_bateau(bateau b,int est_joueur){
     int i;
-    couleur couleur_coque = est_joueur ? vert : bateau2;
-  
+
+    couleur couleur_bat_joueur;
+    if (est_joueur){
+        // couleur pour "afficher" le score
+        couleur_bat_joueur.r = (double)(b.score_poissons * 16 % 256) / 256.0;
+        couleur_bat_joueur.g = 1 - (double)(b.score_poissons * 8 % 256) / 256.0;
+        couleur_bat_joueur.b = 0;
+    }
+    
     /* coque */
     for (i = 0; i < 6; i++){
         dessiner_facette_triangle(b.o.modele,
                                   regle_bateau[i][0],
                                   regle_bateau[i][1],
                                   regle_bateau[i][2],
-                                  couleur_coque);
+                                  est_joueur ? couleur_bat_joueur : bateau2);
     }
     
     for (i = 6; i < 8; i++){
@@ -299,7 +307,7 @@ void afficher_bateau(bateau b,int est_joueur){
                                   regle_bateau[i][0],
                                   regle_bateau[i][1],
                                   regle_bateau[i][2],
-                                  est_joueur ? vert : bateau1);
+                                  est_joueur ? couleur_bat_joueur : bateau1);
     }
     
     /* cabine */
