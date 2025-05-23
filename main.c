@@ -13,22 +13,11 @@
 #include "headers/bateau.h"
 #include "headers/obstacle.h"
 
-#define JOUEUR bateaux[0]
+#define IND_JOUEUR 0
+#define JOUEUR bateaux[0]  // doit coïncider avec IND_JOUEUR
 
 
 /* x : largeur, y : profondeur, z : hauteur */
-
-
-
-/********************************************************
- *                    Organisation                      *
- *                                                      *
- *                                                      *
- * - collisions entre bateaux                           *
- *                                                      *
- *                                                      *
- *                                                      *
- ********************************************************/
 
 
 
@@ -48,7 +37,7 @@ int bouton_presse = 0;   /* État des boutons de la souris */
 
 /* Variables de jeu */
 int touches_pressees[NB_TOUCHES] = {0};  /* Tableau de bits pour les touches */
-int bateau_joueur = 0;  /* Index du bateau contrôlé par le joueur */
+int bateau_joueur = IND_JOUEUR;  /* Index du bateau contrôlé par le joueur */
 double hauteur = 4; /* hauteur par rapport au centre du bateau pour la position de l'observateur */
 
 /* x : largeur, y : profondeur, z : hauteur */
@@ -218,7 +207,10 @@ void Animer() {
         for (j = i+1; j < NB_BATEAUX; j++){
             if (distance_carre_modele(bateaux[i].o.modele, bateaux[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(bateaux[i].o.hitbox, bateaux[j].o.hitbox)){
-                    tourner_bateau(&bateaux[i], M_PI, 'z'); // Demi-tour
+                    if (i != bateau_joueur){
+                        tourner_bateau(&bateaux[i], M_PI + M_PI / 64, 'g'); // Demi-toure
+                        tourner_bateau(&bateaux[j], M_PI + M_PI / 32, 'g'); // Demi-tour
+                    }
                 }
             }
         }
@@ -227,8 +219,10 @@ void Animer() {
         for (j = 0; j < NB_OBSTACLES; j++){
             if (distance_carre_modele(bateaux[i].o.modele, obstacles[j].o.modele) < DIST_CALCUL_COLLISION_CARRE){
                 if (collisions_OBB(bateaux[i].o.hitbox, obstacles[j].o.hitbox)){
-                    
-                    tourner_bateau(&bateaux[i], M_PI, 'z'); // Demi-tour
+                    if (i != bateau_joueur){
+                        tourner_bateau(&bateaux[i], M_PI + M_PI / 256, 'g'); // Demi-tour
+                        deplacer_bateau(&bateaux[i]);
+                    }
                 }
             }
         }
@@ -449,14 +443,26 @@ void controler_bateau_joueur() {
     
     bateau *b = &bateaux[bateau_joueur];
     int i, test_coll = 0, coll_obst = 0;
-    
+
+    // collisisons bateau - joueur
     for (i = 1; i < NB_BATEAUX && !test_coll; i++){
         test_coll = test_coll || collisions_OBB(JOUEUR.o.hitbox, bateaux[i].o.hitbox);
     }
+    // collisison obstaccle - joueur
     for (i = 0; i < NB_OBSTACLES && !test_coll; i++){
         test_coll = test_coll || collisions_OBB(JOUEUR.o.hitbox, obstacles[i].o.hitbox);
         if (test_coll){
             coll_obst = 1;
+        }
+    }
+
+    // joueur sort de la map
+    double marge = 4;
+
+    if (!coll_obst){
+        if (p_x > LIMITE_MAX_X - marge || p_x < LIMITE_MIN_X + marge ||
+            p_y > LIMITE_MAX_Y - marge || p_y < LIMITE_MIN_Y + marge){
+            test_coll = 1;
         }
     }
     

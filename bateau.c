@@ -43,16 +43,6 @@ void deplacer_bateau(bateau *b){
     translation(&(b -> hitbox_canne), dx, dy, dz);
 }
 
-void petit_retour_arrière(bateau *b){
-    double dx = get_mat((*b).direction, 0, 0) * (b -> vitesse);
-    double dy = get_mat((*b).direction, 1, 0) * (b -> vitesse);
-    double dz = get_mat((*b).direction, 2, 0) * (b -> vitesse);
-
-    
-    translation(&(b -> o.modele), -dx, -dy, dz);
-    translation(&(b -> o.hitbox), -dx, -dy, dz);
-    translation(&(b -> hitbox_canne), -dx, -dy, dz);
-}
 
 void tourner_bateau(bateau *b, double theta, char sens){
     double t;
